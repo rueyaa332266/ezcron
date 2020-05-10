@@ -1,10 +1,22 @@
 # Ezcron
-Create cron expression easily
+Create cron expression easily.
 
 ## Feature
 - Translate cron expression to English
 - Show the next execute time
 - [WIP] Creating cron expression easily by prompt
+
+## CRON Expression Format
+Only support 5 space-separated fields.
+```
+Field name     Mandatory?   Allowed values    Allowed special characters
+----------     ----------   --------------    --------------------------
+Minutes        Yes          0-59              * / , -
+Hours          Yes          0-23              * / , -
+Day of month   Yes          1-31              * / , -
+Month          Yes          1-12 or JAN-DEC   * / , -
+Day of week    Yes          0-6 or SUN-SAT    * / , -
+```
 
 ## Installing
 
