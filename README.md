@@ -50,7 +50,7 @@ $ ezcron translate "* * * * *"
 At every minute
 ```
 
-It also works when pass the cron expression by pipe
+It also works when passing the cron expression by pipe.
 ```
 $ echo "* * * * *" | ezcron
 At every minute
