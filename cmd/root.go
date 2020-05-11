@@ -34,6 +34,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(cmdNext)
+	rootCmd.AddCommand(cmdTranslate)
 }
 
 func Execute() {

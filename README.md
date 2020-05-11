@@ -2,7 +2,7 @@
 Create cron expression easily.
 
 ## Feature
-- Translate cron expression to English
+- Translate cron expression into human-friendly language
 - Show the next execute time
 - [WIP] Creating cron expression easily by prompt
 
@@ -32,7 +32,8 @@ Usage:
 
 Available Commands:
   help        Help about any command
-  next        return next execute time
+  next        Return next execute time
+  translate   Translate into human-friendly language
 
 Flags:
   -h, --help   help for ezcron
@@ -43,8 +44,13 @@ Use "ezcron [command] --help" for more information about a command.
 ## Example
 
 ### Translate cron expression
-Pass the cron expression with pipe
 
+```
+$ ezcron translate "* * * * *"
+At every minute
+```
+
+It also works when pass the cron expression by pipe
 ```
 $ echo "* * * * *" | ezcron
 At every minute

@@ -34,29 +34,21 @@ func nextExecTime(cronExpression string) error {
 
 var cmdNext = &cobra.Command{
 	Use:   "next [cron expression]",
-	Short: "return next execute time",
+	Short: "Return next execute time",
 	Long:  `Show the next execute time when inputing cron expression`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// when input from pipe
-		stat, _ := os.Stdin.Stat()
-		if (stat.Mode() & os.ModeCharDevice) == 0 {
-			fmt.Println("not avalibe from pipe")
-			os.Exit(1)
+		// show help message if got no args
+		if len(args) < 1 {
+			cmd.Help()
+			os.Exit(0)
+		}
+		cronExpression := strings.Join(args, " ")
+		valid, _ := translator.MatchCronReg(cronExpression)
+		if valid {
+			nextExecTime(cronExpression)
 		} else {
-			// show help message if got no args
-			if len(args) < 1 {
-				cmd.Help()
-				os.Exit(0)
-			}
-			cronExpression := strings.Join(args, " ")
-			valid, _ := translator.MatchCronReg(cronExpression)
-			if valid {
-				nextExecTime(cronExpression)
-			} else {
-				fmt.Println("invalid syntax")
-				os.Exit(1)
-			}
-
+			fmt.Println("invalid syntax")
+			os.Exit(1)
 		}
 	},
 }
