@@ -173,7 +173,7 @@ func Explaine(cronCheckResults map[string]*CheckResult) {
 	dayWeekCheckResult := cronCheckResults["dayW"]
 	// explain in HH:MM
 	if minuteCheckResult.Pattern == hourCheckResult.Pattern && minuteCheckResult.Pattern == "number" {
-		explanation += "at every " + addZeorforTenDigit(hourCheckResult.Input) + ":" + addZeorforTenDigit(minuteCheckResult.Input)
+		explanation += "at every " + AddZeorforTenDigit(hourCheckResult.Input) + ":" + AddZeorforTenDigit(minuteCheckResult.Input)
 	} else {
 		explanation += explaineMinute(minuteCheckResult)
 		explanationHour := explaineHour(hourCheckResult)
@@ -286,20 +286,20 @@ func explaineHour(c *CheckResult) string {
 	case "asterisk":
 		explanation = ""
 	case "number":
-		hour := addZeorforTenDigit(c.Input)
+		hour := AddZeorforTenDigit(c.Input)
 		explanation += " " + hour + ":00"
 	case "comma":
 		hour := c.Input
 		slice := strings.Split(hour, ",")
 		for i, v := range slice {
-			slice[i] = addZeorforTenDigit(v) + ":00"
+			slice[i] = AddZeorforTenDigit(v) + ":00"
 		}
 		explanation += " " + strings.Join(slice, " and ")
 	case "hyphen":
 		hour := c.Input
 		slice := strings.Split(hour, "-")
 		for i, v := range slice {
-			slice[i] = addZeorforTenDigit(v) + ":00"
+			slice[i] = AddZeorforTenDigit(v) + ":00"
 		}
 		explanation += " from " + strings.Join(slice, "-")
 	case "slash":
@@ -319,14 +319,14 @@ func explaineHour(c *CheckResult) string {
 					hour := CheckResult.Input
 					slice := strings.Split(hour, ",")
 					for i, v := range slice {
-						slice[i] = " " + addZeorforTenDigit(v) + ":00-24:00"
+						slice[i] = " " + AddZeorforTenDigit(v) + ":00-24:00"
 					}
 					output += " from" + strings.Join(slice, " and")
 				case "hyphen":
 					hour := CheckResult.Input
 					slice := strings.Split(hour, "-")
 					for i, v := range slice {
-						slice[i] = addZeorforTenDigit(v) + ":00"
+						slice[i] = AddZeorforTenDigit(v) + ":00"
 					}
 					output += " from " + strings.Join(slice, "-")
 				}
@@ -339,7 +339,7 @@ func explaineHour(c *CheckResult) string {
 					hour := CheckResult.Input
 					slice := strings.Split(hour, ",")
 					for i, v := range slice {
-						slice[i] = addZeorforTenDigit(v) + ":00"
+						slice[i] = AddZeorforTenDigit(v) + ":00"
 					}
 					output = strings.Join(slice, " and ") + output
 				}
@@ -551,7 +551,7 @@ func ordinalFromStr(str string) string {
 	return humanize.Ordinal(i)
 }
 
-func addZeorforTenDigit(str string) string {
+func AddZeorforTenDigit(str string) string {
 	Re := regexp.MustCompile(`^\d{1}$`)
 	if Re.MatchString(str) == true {
 		return "0" + str
