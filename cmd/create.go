@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -11,7 +13,7 @@ import (
 )
 
 var scheduleTypeSuggest = []prompt.Suggest{
-	{Text: "Time", Description: "Create a schedule at specific time or time interval"},
+	{Text: "Time_schedule:", Description: "Create a schedule at specific time or time interval"},
 	{Text: "Daily", Description: "Create a daily schedule at specific timer"},
 	{Text: "Weekly", Description: "Create a weekly schedule on specific weekday at specific time"},
 	{Text: "Monthly", Description: "Create a monthly schedule on specific monthday at specific time"},
@@ -20,8 +22,8 @@ var scheduleTypeSuggest = []prompt.Suggest{
 
 func makeTimeSuggest() []prompt.Suggest {
 	var timeSuggest []prompt.Suggest
-	for i := 0; i < 23; i++ {
-		for j := 0; j < 59; j++ {
+	for i := 0; i < 24; i++ {
+		for j := 0; j < 60; j++ {
 			hour := translator.AddZeorforTenDigit(strconv.Itoa(i))
 			minute := translator.AddZeorforTenDigit(strconv.Itoa(j))
 			suggest := prompt.Suggest{Text: hour + ":" + minute}
@@ -32,8 +34,38 @@ func makeTimeSuggest() []prompt.Suggest {
 	return timeSuggest
 }
 
+func makeMinuteSuggest() []prompt.Suggest {
+	var minuteSuggest []prompt.Suggest
+	for i := 0; i < 60; i++ {
+		minute := strconv.Itoa(i)
+		suggest := prompt.Suggest{Text: minute + "_minute"}
+		minuteSuggest = append(minuteSuggest, suggest)
+	}
+	return minuteSuggest
+}
+
 func executor(in string) {
-	// for the create func
+	inputs := strings.Split(in, " ")
+	// fmt.Println(inputs)
+	switch inputs[0] {
+	case "Time_schedule:":
+		last := inputs[len(inputs)-1]
+		re := regexp.MustCompile(`\d\d:\d\d`)
+		if strings.Contains(last, "minute") {
+			fmt.Println("*/" + strings.Split(last, "_")[0] + " * * * *")
+		} else if re.MatchString(last) {
+			time := strings.Split(last, ":")
+			minute := strings.TrimPrefix(time[1], "0")
+			hour := strings.TrimPrefix(time[0], "0")
+			fmt.Println(minute + " " + hour + " * * *")
+		} else {
+			fmt.Println("Time schedule is not completed")
+		}
+	default:
+		fmt.Println("not implement")
+	}
+
+	os.Exit(0)
 }
 
 func completer(in prompt.Document) []prompt.Suggest {
@@ -43,15 +75,22 @@ func completer(in prompt.Document) []prompt.Suggest {
 	}
 	first := args[0]
 	switch first {
-	case "Time":
+	case "Time_schedule:":
 		second := args[1]
 		if len(args) == 2 {
-			timeAdposition := []prompt.Suggest{{Text: "at"}}
+			timeAdposition := []prompt.Suggest{{Text: "at", Description: "__:__"}, {Text: "every", Description: "per minute"}}
 			return prompt.FilterHasPrefix(timeAdposition, second, true)
 		}
 		third := args[2]
-		if len(args) == 3 {
-			return prompt.FilterHasPrefix(makeTimeSuggest(), third, true)
+		switch second {
+		case "at":
+			if len(args) == 3 {
+				return prompt.FilterHasPrefix(makeTimeSuggest(), third, true)
+			}
+		case "every":
+			if len(args) == 3 {
+				return prompt.FilterHasPrefix(makeMinuteSuggest(), third, true)
+			}
 		}
 
 	default:
@@ -65,7 +104,7 @@ var cmdCreate = &cobra.Command{
 	Short: "Create cron expression",
 	Long:  `Create cron expression with prompt`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Select the schedule of type and press entre")
+		fmt.Println("Select the schedule of type and press space")
 		p := prompt.New(
 			executor,
 			completer,
