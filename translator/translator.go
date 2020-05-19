@@ -334,12 +334,12 @@ func explaineHour(c *CheckResult) string {
 				// for pattern "number" and "comma"
 				switch CheckResult.Pattern {
 				case "number":
-					output = CheckResult.Input + ":00" + output
+					output = "every " + CheckResult.Input + " hour" + output
 				case "comma":
 					hour := CheckResult.Input
 					slice := strings.Split(hour, ",")
 					for i, v := range slice {
-						slice[i] = AddZeorforTenDigit(v) + ":00"
+						slice[i] = "every " + v + " hour"
 					}
 					output = strings.Join(slice, " and ") + output
 				}

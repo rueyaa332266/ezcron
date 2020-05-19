@@ -36,12 +36,22 @@ func makeTimeSuggest() []prompt.Suggest {
 
 func makeMinuteSuggest() []prompt.Suggest {
 	var minuteSuggest []prompt.Suggest
-	for i := 0; i < 60; i++ {
+	for i := 1; i <= 60; i++ {
 		minute := strconv.Itoa(i)
 		suggest := prompt.Suggest{Text: minute + "_minute"}
 		minuteSuggest = append(minuteSuggest, suggest)
 	}
 	return minuteSuggest
+}
+
+func makeHourSuggest() []prompt.Suggest {
+	var hourSuggest []prompt.Suggest
+	for i := 1; i <= 24; i++ {
+		minute := strconv.Itoa(i)
+		suggest := prompt.Suggest{Text: minute + "_hour"}
+		hourSuggest = append(hourSuggest, suggest)
+	}
+	return hourSuggest
 }
 
 func executor(in string) {
@@ -53,6 +63,8 @@ func executor(in string) {
 		re := regexp.MustCompile(`\d\d:\d\d`)
 		if strings.Contains(last, "minute") {
 			fmt.Println("*/" + strings.Split(last, "_")[0] + " * * * *")
+		} else if strings.Contains(last, "hour") {
+			fmt.Println("* */" + strings.Split(last, "_")[0] + " * * *")
 		} else if re.MatchString(last) {
 			time := strings.Split(last, ":")
 			minute := strings.TrimPrefix(time[1], "0")
@@ -64,7 +76,6 @@ func executor(in string) {
 	default:
 		fmt.Println("not implement")
 	}
-
 	os.Exit(0)
 }
 
@@ -78,7 +89,7 @@ func completer(in prompt.Document) []prompt.Suggest {
 	case "Time_schedule:":
 		second := args[1]
 		if len(args) == 2 {
-			timeAdposition := []prompt.Suggest{{Text: "at", Description: "__:__"}, {Text: "every", Description: "per minute"}}
+			timeAdposition := []prompt.Suggest{{Text: "at", Description: "__:__"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}}
 			return prompt.FilterHasPrefix(timeAdposition, second, true)
 		}
 		third := args[2]
@@ -87,9 +98,13 @@ func completer(in prompt.Document) []prompt.Suggest {
 			if len(args) == 3 {
 				return prompt.FilterHasPrefix(makeTimeSuggest(), third, true)
 			}
-		case "every":
+		case "every_minute":
 			if len(args) == 3 {
 				return prompt.FilterHasPrefix(makeMinuteSuggest(), third, true)
+			}
+		case "every_hour":
+			if len(args) == 3 {
+				return prompt.FilterHasPrefix(makeHourSuggest(), third, true)
 			}
 		}
 
