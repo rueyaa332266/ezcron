@@ -14,8 +14,8 @@ import (
 
 var scheduleTypeSuggest = []prompt.Suggest{
 	{Text: "Time_schedule:", Description: "Create a schedule at specific time or time interval"},
-	{Text: "Daily", Description: "Create a daily schedule at specific timer"},
-	{Text: "Weekly", Description: "Create a weekly schedule on specific weekday at specific time"},
+	{Text: "Daily_schedule:", Description: "Create a daily schedule at specific time"},
+	{Text: "Weekly_schedule:", Description: "Create a weekly schedule on specific weekday at specific time"},
 	{Text: "Monthly", Description: "Create a monthly schedule on specific monthday at specific time"},
 	{Text: "Yearly", Description: "create a yearly schedule in specific month on specific monthday at specific time"},
 }
@@ -54,8 +54,27 @@ func makeHourSuggest() []prompt.Suggest {
 	return hourSuggest
 }
 
+func makeWeekdaySuggest() []prompt.Suggest {
+	var weekDaysuggest []prompt.Suggest
+	dayList := [7]string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+	for _, v := range dayList {
+		suggest := prompt.Suggest{Text: v, Description: "at 00:00"}
+		weekDaysuggest = append(weekDaysuggest, suggest)
+	}
+	return weekDaysuggest
+}
+
 func executor(in string) {
-	inputs := strings.Split(in, " ")
+	if in == "" {
+		fmt.Println("Empty input")
+		os.Exit(1)
+	}
+
+	// split and ignore space
+	f := func(c rune) bool {
+		return c == ' '
+	}
+	inputs := strings.FieldsFunc(in, f)
 	// fmt.Println(inputs)
 	switch inputs[0] {
 	case "Time_schedule:":
@@ -72,6 +91,19 @@ func executor(in string) {
 			fmt.Println(minute + " " + hour + " * * *")
 		} else {
 			fmt.Println("Time schedule is not completed")
+		}
+	case "Daily_schedule:":
+		last := inputs[len(inputs)-1]
+		re := regexp.MustCompile(`\d\d:\d\d`)
+		if re.MatchString(last) {
+			time := strings.Split(last, ":")
+			minute := strings.TrimPrefix(time[1], "0")
+			hour := strings.TrimPrefix(time[0], "0")
+			fmt.Println(minute + " " + hour + " */1 * *")
+		} else if last == "every_day" {
+			fmt.Println("0 0 */1 * *")
+		} else {
+			fmt.Println("Daily schedule is not completed")
 		}
 	default:
 		fmt.Println("not implement")
@@ -90,6 +122,7 @@ func completer(in prompt.Document) []prompt.Suggest {
 		second := args[1]
 		if len(args) == 2 {
 			timeAdposition := []prompt.Suggest{{Text: "at", Description: "__:__"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}}
+			prompt.OptionPreviewSuggestionTextColor(prompt.Red)
 			return prompt.FilterHasPrefix(timeAdposition, second, true)
 		}
 		third := args[2]
@@ -107,7 +140,32 @@ func completer(in prompt.Document) []prompt.Suggest {
 				return prompt.FilterHasPrefix(makeHourSuggest(), third, true)
 			}
 		}
-
+	case "Daily_schedule:":
+		second := args[1]
+		if len(args) == 2 {
+			dayAdposition := []prompt.Suggest{{Text: "every_day", Description: "every day at 00:00"}, {Text: "every_day_at", Description: "every day at __:__"}}
+			return prompt.FilterHasPrefix(dayAdposition, second, true)
+		}
+		third := args[2]
+		switch second {
+		case "every_day_at":
+			if len(args) == 3 {
+				return prompt.FilterHasPrefix(makeTimeSuggest(), third, true)
+			}
+		}
+	case "Weekly_schedule:":
+		second := args[1]
+		if len(args) == 2 {
+			dayAdposition := []prompt.Suggest{{Text: "on_every", Description: "weekday"}}
+			return prompt.FilterHasPrefix(dayAdposition, second, true)
+		}
+		third := args[2]
+		switch second {
+		case "on_every":
+			if len(args) == 3 {
+				return prompt.FilterHasPrefix(makeWeekdaySuggest(), third, true)
+			}
+		}
 	default:
 		return prompt.FilterHasPrefix(scheduleTypeSuggest, in.GetWordBeforeCursor(), true)
 	}
