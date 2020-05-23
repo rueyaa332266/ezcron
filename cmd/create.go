@@ -20,6 +20,8 @@ var scheduleTypeSuggest = []prompt.Suggest{
 	{Text: "Yearly", Description: "create a yearly schedule in specific month on specific monthday at specific time"},
 }
 
+var dayList = []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+
 func makeTimeSuggest() []prompt.Suggest {
 	var timeSuggest []prompt.Suggest
 	for i := 0; i < 24; i++ {
@@ -56,9 +58,8 @@ func makeHourSuggest() []prompt.Suggest {
 
 func makeWeekdaySuggest() []prompt.Suggest {
 	var weekDaysuggest []prompt.Suggest
-	dayList := [7]string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 	for _, v := range dayList {
-		suggest := prompt.Suggest{Text: v, Description: "at 00:00"}
+		suggest := prompt.Suggest{Text: v, Description: "default at 00:00"}
 		weekDaysuggest = append(weekDaysuggest, suggest)
 	}
 	return weekDaysuggest
@@ -78,6 +79,10 @@ func executor(in string) {
 	// fmt.Println(inputs)
 	switch inputs[0] {
 	case "Time_schedule:":
+		if len(inputs) != 3 {
+			fmt.Println("input not valid")
+			os.Exit(1)
+		}
 		last := inputs[len(inputs)-1]
 		re := regexp.MustCompile(`\d\d:\d\d`)
 		if strings.Contains(last, "minute") {
@@ -90,9 +95,13 @@ func executor(in string) {
 			hour := strings.TrimPrefix(time[0], "0")
 			fmt.Println(minute + " " + hour + " * * *")
 		} else {
-			fmt.Println("Time schedule is not completed")
+			fmt.Println("Time schedule is not valid")
 		}
 	case "Daily_schedule:":
+		if len(inputs) != 2 && len(inputs) != 3 {
+			fmt.Println("input not valid")
+			os.Exit(1)
+		}
 		last := inputs[len(inputs)-1]
 		re := regexp.MustCompile(`\d\d:\d\d`)
 		if re.MatchString(last) {
@@ -103,7 +112,30 @@ func executor(in string) {
 		} else if last == "every_day" {
 			fmt.Println("0 0 */1 * *")
 		} else {
-			fmt.Println("Daily schedule is not completed")
+			fmt.Println("Daily schedule is not valid")
+		}
+	case "Weekly_schedule:":
+		last := inputs[len(inputs)-1]
+		if len(inputs) == 5 {
+			weekDay := inputs[len(inputs)-3]
+			re := regexp.MustCompile(`\d\d:\d\d`)
+			if re.MatchString(last) && contains(dayList, weekDay) {
+				time := strings.Split(last, ":")
+				minute := strings.TrimPrefix(time[1], "0")
+				hour := strings.TrimPrefix(time[0], "0")
+				fmt.Println(minute + " " + hour + " * * " + translator.WeekDayToNum(weekDay))
+			} else {
+				fmt.Println("Weekly schedule is not valid")
+			}
+		} else if len(inputs) == 3 {
+			if contains(dayList, last) {
+				fmt.Println("0 0 * * " + translator.WeekDayToNum(last))
+			} else {
+				fmt.Println("Weekly schedule is not valid")
+			}
+		} else {
+			fmt.Println("input not valid")
+			os.Exit(1)
 		}
 	default:
 		fmt.Println("not implement")
@@ -147,29 +179,49 @@ func completer(in prompt.Document) []prompt.Suggest {
 			return prompt.FilterHasPrefix(dayAdposition, second, true)
 		}
 		third := args[2]
-		switch second {
-		case "every_day_at":
+		if second == "every_day_at" {
 			if len(args) == 3 {
 				return prompt.FilterHasPrefix(makeTimeSuggest(), third, true)
 			}
 		}
 	case "Weekly_schedule:":
+		// fmt.Println(args)
 		second := args[1]
 		if len(args) == 2 {
 			dayAdposition := []prompt.Suggest{{Text: "on_every", Description: "weekday"}}
 			return prompt.FilterHasPrefix(dayAdposition, second, true)
 		}
 		third := args[2]
-		switch second {
-		case "on_every":
+		if second == "on_every" {
 			if len(args) == 3 {
 				return prompt.FilterHasPrefix(makeWeekdaySuggest(), third, true)
 			}
+			fourth := args[3]
+			if contains(dayList, third) {
+				if len(args) == 4 {
+					return prompt.FilterHasPrefix([]prompt.Suggest{{Text: "at", Description: "__:__"}}, fourth, true)
+				}
+				fifth := args[4]
+				if fourth == "at" {
+					if len(args) == 5 {
+						return prompt.FilterHasPrefix(makeTimeSuggest(), fifth, true)
+					}
+				}
+			}
 		}
+
 	default:
 		return prompt.FilterHasPrefix(scheduleTypeSuggest, in.GetWordBeforeCursor(), true)
 	}
 	return []prompt.Suggest{}
+}
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
 
 var cmdCreate = &cobra.Command{

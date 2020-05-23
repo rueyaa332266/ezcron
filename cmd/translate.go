@@ -16,7 +16,10 @@ var cmdTranslate = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// show help message if got no args
 		if len(args) < 1 {
-			cmd.Help()
+			err := cmd.Help()
+			if err != nil {
+				fmt.Println(err)
+			}
 			os.Exit(0)
 		}
 		cronExpression := strings.Join(args, " ")
