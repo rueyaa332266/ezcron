@@ -25,7 +25,7 @@ var cmdTranslate = &cobra.Command{
 		cronExpression := strings.Join(args, " ")
 		valid, checkResult := translator.MatchCronReg(cronExpression)
 		if valid {
-			translator.Explaine(checkResult)
+			translator.Explain(checkResult)
 		} else {
 			fmt.Println("invalid syntax")
 			os.Exit(1)

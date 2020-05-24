@@ -21,7 +21,7 @@ var rootCmd = &cobra.Command{
 			cronExpression := strings.TrimSuffix(buf.String(), "\n")
 			valid, result := translator.MatchCronReg(cronExpression)
 			if valid {
-				translator.Explaine(result)
+				translator.Explain(result)
 			} else {
 				fmt.Println("invalid syntax")
 				os.Exit(1)

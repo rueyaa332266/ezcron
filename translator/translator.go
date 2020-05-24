@@ -164,7 +164,7 @@ func CheckDayWeekReg(str string) *CheckResult {
 	return &CheckResult{Valid: valid, Input: str, Pattern: pattern}
 }
 
-func Explaine(cronCheckResults map[string]*CheckResult) {
+func Explain(cronCheckResults map[string]*CheckResult) {
 	var explanation string
 	minuteCheckResult := cronCheckResults["minute"]
 	hourCheckResult := cronCheckResults["hour"]
@@ -175,8 +175,8 @@ func Explaine(cronCheckResults map[string]*CheckResult) {
 	if minuteCheckResult.Pattern == hourCheckResult.Pattern && minuteCheckResult.Pattern == "number" {
 		explanation += "at every " + AddZeorforTenDigit(hourCheckResult.Input) + ":" + AddZeorforTenDigit(minuteCheckResult.Input)
 	} else {
-		explanation += explaineMinute(minuteCheckResult)
-		explanationHour := explaineHour(hourCheckResult)
+		explanation += explainMinute(minuteCheckResult)
+		explanationHour := explainHour(hourCheckResult)
 		if explanationHour != "" {
 			explanation += ", " + explanationHour
 		}
@@ -185,8 +185,8 @@ func Explaine(cronCheckResults map[string]*CheckResult) {
 	if dayMonthCheckResult.Pattern == "slash" && dayWeekCheckResult.Pattern != "asterisk" {
 		sliceDayM := strings.Split(dayMonthCheckResult.Input, "/")
 		slachLeftDayM := CheckDayMonthReg(sliceDayM[0])
-		explanationDayMonth := explaineDayMonth(dayMonthCheckResult)
-		explanationDayWeek := explaineDayWeek(dayWeekCheckResult)
+		explanationDayMonth := explainDayMonth(dayMonthCheckResult)
+		explanationDayWeek := explainDayWeek(dayWeekCheckResult)
 		if slachLeftDayM.Pattern == "asterisk" {
 			explanation += ", " + explanationDayMonth + " if it's " + explanationDayWeek
 		} else {
@@ -195,16 +195,16 @@ func Explaine(cronCheckResults map[string]*CheckResult) {
 	} else if dayWeekCheckResult.Pattern == "slash" && dayMonthCheckResult.Pattern != "asterisk" {
 		sliceDayW := strings.Split(dayWeekCheckResult.Input, "/")
 		slachLeftDayW := CheckDayMonthReg(sliceDayW[0])
-		explanationDayMonth := explaineDayMonth(dayMonthCheckResult)
-		explanationDayWeek := explaineDayWeek(dayWeekCheckResult)
+		explanationDayMonth := explainDayMonth(dayMonthCheckResult)
+		explanationDayWeek := explainDayWeek(dayWeekCheckResult)
 		if slachLeftDayW.Pattern == "asterisk" {
 			explanation += ", " + explanationDayMonth + " if it's " + explanationDayWeek
 		} else {
 			explanation += ", " + explanationDayMonth + " and " + explanationDayWeek
 		}
 	} else {
-		explanationDayMonth := explaineDayMonth(dayMonthCheckResult)
-		explanationDayWeek := explaineDayWeek(dayWeekCheckResult)
+		explanationDayMonth := explainDayMonth(dayMonthCheckResult)
+		explanationDayWeek := explainDayWeek(dayWeekCheckResult)
 		if explanationDayMonth != "" && explanationDayWeek != "" {
 			explanation += ", " + explanationDayMonth + " and " + explanationDayWeek
 		} else if explanationDayMonth != "" {
@@ -213,14 +213,14 @@ func Explaine(cronCheckResults map[string]*CheckResult) {
 			explanation += ", " + explanationDayWeek
 		}
 	}
-	explanationMonth := explaineMonth(monthCheckResult)
+	explanationMonth := explainMonth(monthCheckResult)
 	if explanationMonth != "" {
 		explanation += ", " + explanationMonth
 	}
 	fmt.Println(explanation)
 }
 
-func explaineMinute(c *CheckResult) string {
+func explainMinute(c *CheckResult) string {
 	explanation := "At"
 	switch c.Pattern {
 	case "asterisk":
@@ -280,7 +280,7 @@ func explaineMinute(c *CheckResult) string {
 	return explanation
 }
 
-func explaineHour(c *CheckResult) string {
+func explainHour(c *CheckResult) string {
 	explanation := "past"
 	switch c.Pattern {
 	case "asterisk":
@@ -350,7 +350,7 @@ func explaineHour(c *CheckResult) string {
 	return explanation
 }
 
-func explaineDayMonth(c *CheckResult) string {
+func explainDayMonth(c *CheckResult) string {
 	explanation := "on"
 	switch c.Pattern {
 	case "asterisk":
@@ -402,7 +402,7 @@ func explaineDayMonth(c *CheckResult) string {
 	return explanation
 }
 
-func explaineMonth(c *CheckResult) string {
+func explainMonth(c *CheckResult) string {
 	explanation := "in"
 	monthList := [12]string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 	switch c.Pattern {
@@ -464,7 +464,7 @@ func explaineMonth(c *CheckResult) string {
 	return explanation
 }
 
-func explaineDayWeek(c *CheckResult) string {
+func explainDayWeek(c *CheckResult) string {
 	explanation := "on"
 	dayList := [7]string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 	switch c.Pattern {
