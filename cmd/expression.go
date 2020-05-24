@@ -441,17 +441,17 @@ func isDayM(s string) bool {
 	return false
 }
 
-var cmdCreate = &cobra.Command{
-	Use:   "create",
-	Short: "Create cron expression",
-	Long:  `Create cron expression with prompt`,
+var cmdExpression = &cobra.Command{
+	Use:   "expression",
+	Short: "Create a cron expression",
+	Long:  `Create a cron expression with prompt`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Select the schedule of type and press space")
+		fmt.Println("Follow the prompts and create the cron expression")
 		p := prompt.New(
 			executor,
 			completer,
-			prompt.OptionPrefix("Press tab and select >> "),
-			prompt.OptionTitle("excron create"),
+			prompt.OptionPrefix("Press tab for prompts >> "),
+			prompt.OptionTitle("Create cron expression"),
 		)
 		p.Run()
 	},
