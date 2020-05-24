@@ -2,9 +2,9 @@
 Create cron expression easily.
 
 ## Feature
+- Creating cron expression easily by prompt
 - Translate cron expression into human-friendly language
 - Show the next execute time
-- [WIP] Creating cron expression easily by prompt
 
 ## CRON Expression Format
 Only support 5 space-separated fields.
@@ -31,6 +31,7 @@ Usage:
   ezcron [command]
 
 Available Commands:
+  expression  Create a cron expression
   help        Help about any command
   next        Return next execute time
   translate   Translate into human-friendly language
