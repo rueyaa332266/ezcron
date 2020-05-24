@@ -232,7 +232,7 @@ func explaineMinute(c *CheckResult) string {
 		minute := c.Input
 		slice := strings.Split(minute, ",")
 		for i, v := range slice {
-			slice[i] = ordinalFromStr(v)
+			slice[i] = OrdinalFromStr(v)
 		}
 		explanation += " every " + strings.Join(slice, " and ") + " minute"
 	case "hyphen":
@@ -546,7 +546,7 @@ func WeekDayToNum(str string) string {
 	return str
 }
 
-func ordinalFromStr(str string) string {
+func OrdinalFromStr(str string) string {
 	i, _ := strconv.Atoi(str)
 	return humanize.Ordinal(i)
 }

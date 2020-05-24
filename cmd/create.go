@@ -16,11 +16,12 @@ var scheduleTypeSuggest = []prompt.Suggest{
 	{Text: "Time_schedule:", Description: "Create a schedule at specific time or time interval"},
 	{Text: "Daily_schedule:", Description: "Create a daily schedule at specific time"},
 	{Text: "Weekly_schedule:", Description: "Create a weekly schedule on specific weekday at specific time"},
-	{Text: "Monthly", Description: "Create a monthly schedule on specific monthday at specific time"},
+	{Text: "Monthly_schedule:", Description: "Create a monthly schedule on specific monthday at specific time"},
 	{Text: "Yearly", Description: "create a yearly schedule in specific month on specific monthday at specific time"},
 }
 
-var dayList = []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+var dayWList = []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+var dayMList []string
 
 func makeTimeSuggest() []prompt.Suggest {
 	var timeSuggest []prompt.Suggest
@@ -58,11 +59,30 @@ func makeHourSuggest() []prompt.Suggest {
 
 func makeWeekdaySuggest() []prompt.Suggest {
 	var weekDaysuggest []prompt.Suggest
-	for _, v := range dayList {
+	for _, v := range dayWList {
 		suggest := prompt.Suggest{Text: v, Description: "default at 00:00"}
 		weekDaysuggest = append(weekDaysuggest, suggest)
 	}
 	return weekDaysuggest
+}
+
+func makeMonthdaySuggest() []prompt.Suggest {
+	var monthDaysuggest []prompt.Suggest
+	for i := 1; i < 32; i++ {
+		day := translator.OrdinalFromStr(strconv.Itoa(i))
+		suggest := prompt.Suggest{Text: day + "_day", Description: "of month"}
+		monthDaysuggest = append(monthDaysuggest, suggest)
+	}
+	return monthDaysuggest
+}
+
+func makeMonthSuggest() []prompt.Suggest {
+	var monthSuggest []prompt.Suggest
+	for i := 1; i < 13; i++ {
+		suggest := prompt.Suggest{Text: strconv.Itoa(i) + "_month", Description: "default at 00:00"}
+		monthSuggest = append(monthSuggest, suggest)
+	}
+	return monthSuggest
 }
 
 func executor(in string) {
@@ -119,7 +139,7 @@ func executor(in string) {
 		if len(inputs) == 5 {
 			weekDay := inputs[len(inputs)-3]
 			re := regexp.MustCompile(`\d\d:\d\d`)
-			if re.MatchString(last) && contains(dayList, weekDay) {
+			if re.MatchString(last) && contains(dayWList, weekDay) {
 				time := strings.Split(last, ":")
 				minute := strings.TrimPrefix(time[1], "0")
 				hour := strings.TrimPrefix(time[0], "0")
@@ -128,7 +148,7 @@ func executor(in string) {
 				fmt.Println("Weekly schedule is not valid")
 			}
 		} else if len(inputs) == 3 {
-			if contains(dayList, last) {
+			if contains(dayWList, last) {
 				fmt.Println("0 0 * * " + translator.WeekDayToNum(last))
 			} else {
 				fmt.Println("Weekly schedule is not valid")
@@ -179,10 +199,8 @@ func completer(in prompt.Document) []prompt.Suggest {
 			return prompt.FilterHasPrefix(dayAdposition, second, true)
 		}
 		third := args[2]
-		if second == "every_day_at" {
-			if len(args) == 3 {
-				return prompt.FilterHasPrefix(makeTimeSuggest(), third, true)
-			}
+		if second == "every_day_at" && len(args) == 3 {
+			return prompt.FilterHasPrefix(makeTimeSuggest(), third, true)
 		}
 	case "Weekly_schedule:":
 		// fmt.Println(args)
@@ -197,27 +215,80 @@ func completer(in prompt.Document) []prompt.Suggest {
 				return prompt.FilterHasPrefix(makeWeekdaySuggest(), third, true)
 			}
 			fourth := args[3]
-			if contains(dayList, third) {
+			if contains(dayWList, third) {
 				if len(args) == 4 {
 					return prompt.FilterHasPrefix([]prompt.Suggest{{Text: "at", Description: "__:__"}}, fourth, true)
 				}
 				fifth := args[4]
-				if fourth == "at" {
+				if fourth == "at" && len(args) == 5 {
+					return prompt.FilterHasPrefix(makeTimeSuggest(), fifth, true)
+				}
+			}
+		}
+	case "Monthly_schedule:":
+		// fmt.Println(args)
+		second := args[1]
+		if len(args) == 2 {
+			dayAdposition := []prompt.Suggest{{Text: "on", Description: "monthday"}}
+			return prompt.FilterHasPrefix(dayAdposition, second, true)
+		}
+		third := args[2]
+		if second == "on" {
+			if len(args) == 3 {
+				return prompt.FilterHasPrefix(makeMonthdaySuggest(), third, true)
+			}
+			fourth := args[3]
+			if strings.Contains(third, "_day") {
+				if len(args) == 4 {
+					return prompt.FilterHasPrefix([]prompt.Suggest{{Text: "of_every_month", Description: "per month, default at 00:00"}, {Text: "of_every", Description: "period of month"}}, fourth, true)
+				}
+				fifth := args[4]
+				switch fourth {
+				case "of_every_month":
 					if len(args) == 5 {
-						return prompt.FilterHasPrefix(makeTimeSuggest(), fifth, true)
+						return prompt.FilterHasPrefix([]prompt.Suggest{{Text: "at", Description: "__:__"}}, fifth, true)
+					}
+					sixth := args[5]
+					if fifth == "at" && len(args) == 6 {
+						return prompt.FilterHasPrefix(makeTimeSuggest(), sixth, true)
+					}
+				case "of_every":
+					if len(args) == 5 {
+						return prompt.FilterHasPrefix(makeMonthSuggest(), fifth, true)
+					}
+					sixth := args[5]
+					if strings.Contains(fifth, "_month") {
+						if len(args) == 6 {
+							return prompt.FilterHasPrefix([]prompt.Suggest{{Text: "at", Description: "__:__"}}, sixth, true)
+						}
+						seventh := args[6]
+						if sixth == "at" && len(args) == 7 {
+							return prompt.FilterHasPrefix(makeTimeSuggest(), seventh, true)
+						}
 					}
 				}
 			}
 		}
-
 	default:
 		return prompt.FilterHasPrefix(scheduleTypeSuggest, in.GetWordBeforeCursor(), true)
 	}
 	return []prompt.Suggest{}
 }
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
+func contains(slice []string, str string) bool {
+	for _, v := range slice {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
+func isDayM(s string) bool {
+	for i := 1; i < 32; i++ {
+		day := translator.OrdinalFromStr(strconv.Itoa(i))
+		dayMList = append(dayMList, day)
+	}
+	for _, a := range dayMList {
+		if a == s {
 			return true
 		}
 	}
