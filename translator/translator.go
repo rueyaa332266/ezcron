@@ -15,7 +15,7 @@ type CheckResult struct {
 	Pattern string
 }
 
-// 	Field name     Mandatory?   Allowed values    Allowed special characters
+// Field name     Mandatory?   Allowed values    Allowed special characters
 // ----------     ----------   --------------    --------------------------
 // Minutes        Yes          0-59              * / , -
 // Hours          Yes          0-23              * / , -

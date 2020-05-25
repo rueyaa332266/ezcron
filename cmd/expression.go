@@ -17,7 +17,7 @@ var scheduleTypeSuggest = []prompt.Suggest{
 	{Text: "Daily_schedule:", Description: "Create a daily schedule at specific time"},
 	{Text: "Weekly_schedule:", Description: "Create a weekly schedule on specific weekday at specific time"},
 	{Text: "Monthly_schedule:", Description: "Create a monthly schedule on specific monthday at specific time"},
-	{Text: "Yearly_schedule:", Description: "create a yearly schedule in specific month on specific monthday at specific time"},
+	{Text: "Yearly_schedule:", Description: "Create a yearly schedule in specific month on specific monthday at specific time"},
 }
 
 var dayWList = []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
@@ -269,7 +269,7 @@ func completer(in prompt.Document) []prompt.Suggest {
 	case "Time_schedule:":
 		second := args[1]
 		if len(args) == 2 {
-			timeAdposition := []prompt.Suggest{{Text: "at", Description: "__:__"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}}
+			timeAdposition := []prompt.Suggest{{Text: "at", Description: "__:__ every day"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}}
 			prompt.OptionPreviewSuggestionTextColor(prompt.Red)
 			return prompt.FilterHasPrefix(timeAdposition, second, true)
 		}

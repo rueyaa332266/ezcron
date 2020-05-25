@@ -1,8 +1,37 @@
 # Ezcron
-Create cron expression easily.
+Create cron expression like a boss 😎
+
+## DEMO
+```shell
+$ezcron expression
+```
+
+![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/demo.gif)
+
+Five types of schedule are available.
+
+- Time schedule:
+
+    Create a schedule at specific time or time interval.
+
+- Daily schedule:
+
+    Create a daily schedule at specific time.
+
+- Weekly schedule:
+
+    Create a weekly schedule on specific weekday at specific time.
+
+- Monthly schedule
+
+    Create a monthly schedule on specific monthday at specific time.
+
+- Yearly schedule
+
+    Create a yearly schedule in specific date at specific time.
 
 ## Feature
-- Creating cron expression easily by prompt
+- Creating cron expression with prompts
 - Translate cron expression into human-friendly language
 - Show the next execute time
 
