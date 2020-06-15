@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/dustin/go-humanize"
+	"github.com/rueyaa332266/multiregexp"
 )
 
 type CheckResult struct {
@@ -46,27 +47,35 @@ func MatchCronReg(cronExpression string) (bool, map[string]*CheckResult) {
 
 func checkFieldPattern(str string, patternList map[string]string) (bool, string) {
 	var pattern string
-	valid := true
+	var valid bool
+	var regs multiregexp.Regexps
+
 	asteriskReg := regexp.MustCompile(`^` + patternList["asterisk"] + `$`)
 	numberReg := regexp.MustCompile(`^` + patternList["number"] + `$`)
 	commaReg := regexp.MustCompile(`^` + patternList["comma"] + `$`)
 	hyphenReg := regexp.MustCompile(`^` + patternList["hyphen"] + `$`)
 	slashReg := regexp.MustCompile(`^` + patternList["slash"] + `$`)
 
-	switch {
-	case asteriskReg.MatchString(str) == true:
-		pattern = "asterisk"
-	case numberReg.MatchString(str) == true:
-		pattern = "number"
-	case commaReg.MatchString(str) == true:
-		pattern = "comma"
-	case hyphenReg.MatchString(str) == true:
-		pattern = "hyphen"
-	case slashReg.MatchString(str) == true:
-		pattern = "slash"
-	default:
-		pattern = "not match"
+	regs = multiregexp.Append(regs, asteriskReg, numberReg, commaReg, hyphenReg, slashReg)
+	match := regs.MatchStringWhich(str)
+
+	if len(match) == 0 {
 		valid = false
+		pattern = "not match"
+	} else if len(match) == 1 {
+		valid = true
+		switch match[0] {
+		case 0:
+			pattern = "asterisk"
+		case 1:
+			pattern = "number"
+		case 2:
+			pattern = "comma"
+		case 3:
+			pattern = "hyphen"
+		case 4:
+			pattern = "slash"
+		}
 	}
 
 	return valid, pattern
