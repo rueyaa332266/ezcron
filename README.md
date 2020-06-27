@@ -34,6 +34,13 @@ Five types of schedule are available.
 - Creating cron expression with prompts
 - Translate cron expression into human-friendly language
 - Show the next execute time
+- And more ...
+
+## TODO
+- Add the test
+- More DEMO of each type of schedule
+- Add number option for Next command
+- Refactor the code
 
 ## CRON Expression Format
 Only support 5 space-separated fields.
