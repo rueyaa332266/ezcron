@@ -110,7 +110,7 @@ func executor(in string) {
 	switch inputs[0] {
 	case "Time_schedule:":
 		if len(inputs) != 3 {
-			fmt.Println("input not valid")
+			fmt.Println("invalid input")
 			os.Exit(1)
 		}
 		last := inputs[len(inputs)-1]
@@ -125,11 +125,11 @@ func executor(in string) {
 			hour := strings.TrimPrefix(time[0], "0")
 			fmt.Println(minute + " " + hour + " * * *")
 		} else {
-			fmt.Println("Time schedule is not valid")
+			fmt.Println("Time schedule is invalid")
 		}
 	case "Daily_schedule:":
 		if len(inputs) != 2 && len(inputs) != 3 {
-			fmt.Println("input not valid")
+			fmt.Println("invalid input")
 			os.Exit(1)
 		}
 		last := inputs[len(inputs)-1]
@@ -142,7 +142,7 @@ func executor(in string) {
 		} else if last == "every_day" {
 			fmt.Println("0 0 */1 * *")
 		} else {
-			fmt.Println("Daily schedule is not valid")
+			fmt.Println("Daily schedule is invalid")
 		}
 	case "Weekly_schedule:":
 		last := inputs[len(inputs)-1]
@@ -155,16 +155,16 @@ func executor(in string) {
 				hour := strings.TrimPrefix(time[0], "0")
 				fmt.Println(minute + " " + hour + " * * " + translator.WeekDayToNum(weekDay))
 			} else {
-				fmt.Println("Weekly schedule is not valid")
+				fmt.Println("Weekly schedule is invalid")
 			}
 		} else if len(inputs) == 3 {
 			if contains(dayWList, last) {
 				fmt.Println("0 0 * * " + translator.WeekDayToNum(last))
 			} else {
-				fmt.Println("Weekly schedule is not valid")
+				fmt.Println("Weekly schedule is invalid")
 			}
 		} else {
-			fmt.Println("input not valid")
+			fmt.Println("invalid input")
 			os.Exit(1)
 		}
 	case "Monthly_schedule:":
@@ -182,7 +182,7 @@ func executor(in string) {
 				perMonth := strings.TrimRight(perMonth, "_month")
 				fmt.Println(minute + " " + hour + " " + monthDay + " */" + perMonth + " *")
 			} else {
-				fmt.Println("Monthly schedule is not valid")
+				fmt.Println("Monthly schedule is invalid")
 			}
 		} else if len(inputs) == 6 {
 			monthDay := inputs[2]
@@ -195,7 +195,7 @@ func executor(in string) {
 				monthDay := re.FindAllString(monthDay, 1)[0]
 				fmt.Println(minute + " " + hour + " " + monthDay + " */1 *")
 			} else {
-				fmt.Println("Monthly schedule is not valid")
+				fmt.Println("Monthly schedule is invalid")
 			}
 		} else if len(inputs) == 5 {
 			monthDay := inputs[2]
@@ -206,7 +206,7 @@ func executor(in string) {
 				perMonth := strings.TrimRight(perMonth, "_month")
 				fmt.Println("0 0 " + monthDay + " */" + perMonth + " *")
 			} else {
-				fmt.Println("Monthly schedule is not valid")
+				fmt.Println("Monthly schedule is invalid")
 			}
 		} else if len(inputs) == 4 {
 			monthDay := inputs[2]
@@ -215,10 +215,10 @@ func executor(in string) {
 				monthDay := re.FindAllString(monthDay, 1)[0]
 				fmt.Println("0 0 " + monthDay + " */1 *")
 			} else {
-				fmt.Println("Monthly schedule is not valid")
+				fmt.Println("Monthly schedule is invalid")
 			}
 		} else {
-			fmt.Println("input not valid")
+			fmt.Println("invalid input")
 			os.Exit(1)
 		}
 	case "Yearly_schedule:":
@@ -237,7 +237,7 @@ func executor(in string) {
 				month := translator.MonthToNum(month)
 				fmt.Println(minute + " " + hour + " " + monthDay + " " + month + " *")
 			} else {
-				fmt.Println("Weekly schedule is not valid")
+				fmt.Println("Weekly schedule is invalid")
 			}
 		} else if len(inputs) == 4 {
 			month := inputs[2]
@@ -250,11 +250,11 @@ func executor(in string) {
 				fmt.Println("0 0 " + monthDay + " " + month + " *")
 			}
 		} else {
-			fmt.Println("input not valid")
+			fmt.Println("invalid input")
 			os.Exit(1)
 		}
 	default:
-		fmt.Println("input not valid")
+		fmt.Println("invalid input")
 	}
 	os.Exit(0)
 }
@@ -423,18 +423,6 @@ func completer(in prompt.Document) []prompt.Suggest {
 func contains(slice []string, str string) bool {
 	for _, v := range slice {
 		if v == str {
-			return true
-		}
-	}
-	return false
-}
-func isDayM(s string) bool {
-	for i := 1; i < 32; i++ {
-		day := translator.OrdinalFromStr(strconv.Itoa(i))
-		dayMList = append(dayMList, day)
-	}
-	for _, a := range dayMList {
-		if a == s {
 			return true
 		}
 	}
