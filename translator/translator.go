@@ -81,6 +81,7 @@ func checkFieldPattern(str string, patternList map[string]string) (bool, string)
 	return valid, pattern
 }
 
+// [TODO] remove return string
 // check the logic and format in some pattern
 func numLogicFormat(input string, pattern string) (bool, string) {
 	valid := true
