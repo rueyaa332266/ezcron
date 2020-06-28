@@ -24,6 +24,67 @@ func TestMatchCronReg(t *testing.T) {
 	}
 }
 
+func TestCheckFieldPattern(t *testing.T) {
+	asterisk := `\*`
+	number := `([0-9]|[1-5][0-9])`
+	comma := `(` + number + `\,){1,59}` + number
+	hyphen := number + `\-` + number
+	slash := `(` + asterisk + `|` + number + `|` + comma + `|` + hyphen + `)` + `\/` + `(` + number + `|` + comma + `)`
+	patternList := map[string]string{"asterisk": asterisk, "number": number, "comma": comma, "hyphen": hyphen, "slash": slash}
+
+	gotValid, gotPattern := checkFieldPattern("Invalid", patternList)
+	if gotValid != false || gotPattern != "not match" {
+		t.Errorf("Error in not match")
+	}
+	checkList := []string{"*", "1", "1,2", "1-2", "*/1"}
+	wantList := []string{"asterisk", "number", "comma", "hyphen", "slash"}
+	for i := range checkList {
+		_, got := checkFieldPattern(checkList[i], patternList)
+		want := wantList[i]
+		if got != want {
+			t.Errorf("Got: %s, but want: %s", got, want)
+		}
+	}
+}
+
+func TestNumLogicFormat(t *testing.T) {
+	type ckeck struct {
+		input   string
+		pattern string
+	}
+	type re struct {
+		valid bool
+		out   string
+	}
+	checkList := []ckeck{
+		{"1-2", "hyphen"},
+		{"2-1", "hyphen"},
+		{"1,2,3", "comma"},
+		{"1,2,2", "comma"},
+		{"*/1,2,2", "slash"},
+		{"*/2-1", "slash"},
+	}
+	wantList := []re{
+		{true, "1-2"},
+		{false, "2-1"},
+		{true, "1,2,3"},
+		{true, "1,2"},
+		{true, "*/1,2"},
+		{false, "*/2-1"},
+	}
+	for i := range checkList {
+		gotValid, gotStr := numLogicFormat(checkList[i].input, checkList[i].pattern)
+		wantValid := wantList[i].valid
+		wantStr := wantList[i].out
+		if gotValid != wantValid {
+			t.Errorf("Error in pattern: %s", checkList[i].pattern)
+		}
+		if gotStr != wantStr {
+			t.Errorf("Error in pattern: %s", checkList[i].pattern)
+		}
+	}
+}
+
 func TestCheckMinuteReg(t *testing.T) {
 	checkList := []string{"*", "1", "2,3,4", "1-2", "*/1"}
 	wantList := []CheckResult{
@@ -115,10 +176,10 @@ func TestCheckDayWeekReg(t *testing.T) {
 }
 
 func TestMonthToNum(t *testing.T) {
-	gotList := []string{"Jan", "FEB", "March", "APr", "MaY", "june", "July", "Aug", "Sep", "Oct", "Nov", "Dec"}
+	checkList := []string{"Jan", "FEB", "March", "APr", "MaY", "june", "July", "Aug", "Sep", "Oct", "Nov", "Dec"}
 	wantList := []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}
-	for i := range gotList {
-		got := MonthToNum(gotList[i])
+	for i := range checkList {
+		got := MonthToNum(checkList[i])
 		want := wantList[i]
 		if got != want {
 			t.Errorf("Got: %s, but want: %s", got, want)
@@ -127,10 +188,10 @@ func TestMonthToNum(t *testing.T) {
 }
 
 func TestWeekDayToNum(t *testing.T) {
-	gotList := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+	checkList := []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
 	wantList := []string{"0", "1", "2", "3", "4", "5", "6"}
-	for i := range gotList {
-		got := WeekDayToNum(gotList[i])
+	for i := range checkList {
+		got := WeekDayToNum(checkList[i])
 		want := wantList[i]
 		if got != want {
 			t.Errorf("Got: %s, but want: %s", got, want)
@@ -139,10 +200,10 @@ func TestWeekDayToNum(t *testing.T) {
 }
 
 func TestOrdinalFromStr(t *testing.T) {
-	gotList := []string{"1", "2", "3", "4"}
+	checkList := []string{"1", "2", "3", "4"}
 	wantList := []string{"1st", "2nd", "3rd", "4th"}
-	for i := range gotList {
-		got := OrdinalFromStr(gotList[i])
+	for i := range checkList {
+		got := OrdinalFromStr(checkList[i])
 		want := wantList[i]
 		if got != want {
 			t.Errorf("Got: %s, but want: %s", got, want)
@@ -151,10 +212,10 @@ func TestOrdinalFromStr(t *testing.T) {
 }
 
 func TestAddZeorforTenDigit(t *testing.T) {
-	gotList := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+	checkList := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 	wantList := []string{"00", "01", "02", "03", "04", "05", "06", "07", "08", "09"}
-	for i := range gotList {
-		got := AddZeorforTenDigit(gotList[i])
+	for i := range checkList {
+		got := AddZeorforTenDigit(checkList[i])
 		want := wantList[i]
 		if got != want {
 			t.Errorf("Got: %s, but want: %s", got, want)

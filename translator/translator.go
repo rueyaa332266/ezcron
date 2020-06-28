@@ -81,25 +81,26 @@ func checkFieldPattern(str string, patternList map[string]string) (bool, string)
 	return valid, pattern
 }
 
-// [TODO] remove return string
+// [TODO] Add slash format check
 // check the logic and format in some pattern
 func numLogicFormat(input string, pattern string) (bool, string) {
 	valid := true
+	output := input
 	switch pattern {
 	case "hyphen":
 		slice := strings.Split(input, "-")
 		valid = slice[0] < slice[1]
 	case "comma":
-		unigueStr := uniqueSlice(strings.Split(input, ","))
-		input = strings.Join(unigueStr, ",")
+		unique := uniqueSlice(strings.Split(input, ","))
+		output = strings.Join(unique, ",")
 	case "slash":
 		slice := strings.Split(input, "/")
 		validLeft, strLeft := numLogicFormat(slice[0], CheckMinuteReg(slice[0]).Pattern)
 		validRight, strRight := numLogicFormat(slice[1], CheckMinuteReg(slice[1]).Pattern)
 		valid = validLeft && validRight
-		input = strLeft + "/" + strRight
+		output = strLeft + "/" + strRight
 	}
-	return valid, input
+	return valid, output
 }
 
 func CheckMinuteReg(str string) *CheckResult {
