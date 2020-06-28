@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func nextExecTime(cronExpression string) error {
+func nextExecTime(cronExpression string) (time.Time, error) {
 	valid, _ := translator.MatchCronReg(cronExpression)
 	if valid {
 		cronExpression = translator.MonthToNum(cronExpression)
@@ -20,15 +20,14 @@ func nextExecTime(cronExpression string) error {
 		sched, err := cron.ParseStandard(cronExpression)
 		if err != nil {
 			fmt.Println(cronExpression, "invalid syntax")
-			return err
+			return time.Now(), err
 		} else {
-			fmt.Println("Next execute time:", sched.Next(time.Now()))
-			return nil
+			return sched.Next(time.Now()), nil
 		}
 	} else {
 		fmt.Println(cronExpression, "invalid syntax")
 		err := errors.New("invalid syntax")
-		return err
+		return time.Now(), err
 	}
 }
 
@@ -48,7 +47,8 @@ var cmdNext = &cobra.Command{
 		cronExpression := strings.Join(args, " ")
 		valid, _ := translator.MatchCronReg(cronExpression)
 		if valid {
-			nextExecTime(cronExpression)
+			next, _ := nextExecTime(cronExpression)
+			fmt.Println("Next execute time:", next)
 		} else {
 			fmt.Println("invalid syntax")
 			os.Exit(1)

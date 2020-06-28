@@ -2,11 +2,15 @@ package cmd
 
 import (
 	"testing"
+	"time"
 )
 
 func TestNextExecTime(t *testing.T) {
-	got := nextExecTime("* * * * *")
-	if got != nil {
-		t.Errorf("Error when check next execute time")
+	const layout = "2000-01-01 01:01:01"
+	got, _ := nextExecTime("* * * * *")
+	want := time.Now().Add(1 * time.Minute).Format(layout)
+
+	if got.Format(layout) != want {
+		t.Errorf("Got: %v, but want: %s", got, want)
 	}
 }
