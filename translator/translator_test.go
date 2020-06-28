@@ -6,7 +6,8 @@ import (
 )
 
 func TestMatchCronReg(t *testing.T) {
-	gotValid, gotCheckResults := MatchCronReg("1 1-2 3,4 */1 *")
+	checkList := []string{"1 1-2 3,4 */1 *", "* * * * * *"}
+	validList := []bool{true, false}
 	want := map[string]*CheckResult{
 		"minute": {true, "1", "number"},
 		"hour":   {true, "1-2", "hyphen"},
@@ -14,12 +15,18 @@ func TestMatchCronReg(t *testing.T) {
 		"month":  {true, "*/1", "slash"},
 		"dayW":   {true, "*", "asterisk"},
 	}
-	if gotValid != true {
-		t.Errorf("got: %t; want: %t", gotValid, true)
-	}
-	for key := range want {
-		if !reflect.DeepEqual(gotCheckResults[key], want[key]) {
-			t.Errorf("Error in field: %s", key)
+	for i := range checkList {
+		gotValid, gotCheckResults := MatchCronReg(checkList[i])
+		if gotValid != validList[i] {
+			t.Errorf("got: %t; want: %t", gotValid, true)
+		}
+		// check only in valid pattern
+		if i == 0 {
+			for key := range want {
+				if !reflect.DeepEqual(gotCheckResults[key], want[key]) {
+					t.Errorf("Error in field: %s", key)
+				}
+			}
 		}
 	}
 }
@@ -175,7 +182,26 @@ func TestCheckDayWeekReg(t *testing.T) {
 	}
 }
 
-// Test Explane
+func ExampleExplain() {
+	checkList := []string{
+		"* * * * *",
+		"30 12 * * *",
+		"* * */1 * *",
+		"* * * * */1",
+		"* * 1 * 1",
+	}
+	for i := range checkList {
+		_, checkResult := MatchCronReg(checkList[i])
+		Explain(checkResult)
+	}
+
+	// Output:
+	// At every minute
+	// At every 12:30
+	// At every minute, on every 1 day of month
+	// At every minute, on every 1 day of week
+	// At every minute, on day 1 of the month and on Monday
+}
 
 func TestExplainMinute(t *testing.T) {
 	checkList := []string{"*", "1", "2,3,4", "1-2", "*/1", "1/1,2", "1,2/1", "1-2/1"}

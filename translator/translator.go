@@ -27,6 +27,10 @@ func MatchCronReg(cronExpression string) (bool, map[string]*CheckResult) {
 	var checkResults = make(map[string]*CheckResult)
 	fieldSlice := strings.Split(cronExpression, " ")
 
+	if len(fieldSlice) != 5 {
+		return false, checkResults
+	}
+
 	for index, field := range fieldSlice {
 		switch index {
 		case 0: // minute
@@ -183,7 +187,7 @@ func Explain(cronCheckResults map[string]*CheckResult) {
 	dayWeekCheckResult := cronCheckResults["dayW"]
 	// explain in HH:MM
 	if minuteCheckResult.Pattern == hourCheckResult.Pattern && minuteCheckResult.Pattern == "number" {
-		explanation += "at every " + AddZeorforTenDigit(hourCheckResult.Input) + ":" + AddZeorforTenDigit(minuteCheckResult.Input)
+		explanation += "At every " + AddZeorforTenDigit(hourCheckResult.Input) + ":" + AddZeorforTenDigit(minuteCheckResult.Input)
 	} else {
 		explanation += explainMinute(minuteCheckResult)
 		explanationHour := explainHour(hourCheckResult)
