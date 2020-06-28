@@ -270,7 +270,6 @@ func completer(in prompt.Document) []prompt.Suggest {
 		second := args[1]
 		if len(args) == 2 {
 			timeAdposition := []prompt.Suggest{{Text: "at", Description: "__:__ every day"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}}
-			prompt.OptionPreviewSuggestionTextColor(prompt.Red)
 			return prompt.FilterHasPrefix(timeAdposition, second, true)
 		}
 		third := args[2]
