@@ -51,8 +51,8 @@ func makeMinuteSuggest() []prompt.Suggest {
 func makeHourSuggest() []prompt.Suggest {
 	var hourSuggest []prompt.Suggest
 	for i := 1; i <= 24; i++ {
-		minute := strconv.Itoa(i)
-		suggest := prompt.Suggest{Text: minute + "_hour"}
+		hour := strconv.Itoa(i)
+		suggest := prompt.Suggest{Text: hour + "_hour"}
 		hourSuggest = append(hourSuggest, suggest)
 	}
 	return hourSuggest
@@ -69,7 +69,7 @@ func makeWeekdaySuggest() []prompt.Suggest {
 
 func makeMonthdaySuggest() []prompt.Suggest {
 	var monthDaysuggest []prompt.Suggest
-	for i := 1; i < 32; i++ {
+	for i := 1; i <= 31; i++ {
 		day := translator.OrdinalFromStr(strconv.Itoa(i))
 		suggest := prompt.Suggest{Text: day + "_day", Description: "of month"}
 		monthDaysuggest = append(monthDaysuggest, suggest)
