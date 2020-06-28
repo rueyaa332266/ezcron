@@ -175,6 +175,111 @@ func TestCheckDayWeekReg(t *testing.T) {
 	}
 }
 
+// Test Explane
+
+func TestExplainMinute(t *testing.T) {
+	checkList := []string{"*", "1", "2,3,4", "1-2", "*/1", "1/1,2", "1,2/1", "1-2/1"}
+	wantList := []string{
+		"At every minute",
+		"At every 1st minute",
+		"At every 2nd and 3rd and 4th minute",
+		"At every 1 through 2 minute",
+		"At every 1 minute",
+		"At every 1,2 minute from minute 1 through minute 59",
+		"At every 1 minute from minute 1 through minute 59 and minute 2 through minute 59",
+		"At every 1 minute from minute 1 through minute 2",
+	}
+	for i := range checkList {
+		got := explainMinute(CheckMinuteReg(checkList[i]))
+		want := wantList[i]
+		if got != want {
+			t.Errorf("Got: %s, but want: %s", got, want)
+		}
+	}
+}
+
+func TestExplainHour(t *testing.T) {
+	checkList := []string{"*", "1", "2,3,4", "1-2", "*/1", "1/1,2", "1,2/1", "1-2/1"}
+	wantList := []string{
+		"",
+		"past 01:00",
+		"past 02:00 and 03:00 and 04:00",
+		"past from 01:00-02:00",
+		"past every 1 hour",
+		"past every 1 hour and every 2 hour from 1:00-24:00",
+		"past every 1 hour from 01:00-24:00 and 02:00-24:00",
+		"past every 1 hour from 01:00-02:00",
+	}
+	for i := range checkList {
+		got := explainHour(CheckHourReg(checkList[i]))
+		want := wantList[i]
+		if got != want {
+			t.Errorf("Got: %s, but want: %s", got, want)
+		}
+	}
+}
+
+func TestExplainDayMonth(t *testing.T) {
+	checkList := []string{"*", "1", "2,3,4", "1-2", "*/1", "1/1,2", "1,2/1", "1-2/1"}
+	wantList := []string{
+		"",
+		"on day 1 of the month",
+		"on day 2 and 3 and 4 of the month",
+		"between day 1 and 2 of the month",
+		"on every 1 day of month",
+		"on every 1,2 day of month from day 1 of the month",
+		"on every 1 day of month from day 1 of the month and day 2 of the month",
+		"on every 1 day of month between day 1 and day 2 of the month",
+	}
+	for i := range checkList {
+		got := explainDayMonth(CheckDayMonthReg(checkList[i]))
+		want := wantList[i]
+		if got != want {
+			t.Errorf("Got: %s, but want: %s", got, want)
+		}
+	}
+}
+
+func TestExplainMonth(t *testing.T) {
+	checkList := []string{"*", "1", "2,3,4", "1-2", "*/1", "1/1,2", "1,2/1", "1-2/1"}
+	wantList := []string{
+		"",
+		"in January",
+		"in February and March and April",
+		"in every month from January through February",
+		"in every 1 month",
+		"in every 1,2 month from January",
+		"in every 1 month from January and February",
+		"in every 1 month from January through February",
+	}
+	for i := range checkList {
+		got := explainMonth(CheckMonthReg(checkList[i]))
+		want := wantList[i]
+		if got != want {
+			t.Errorf("Got: %s, but want: %s", got, want)
+		}
+	}
+}
+func TestExplainDayWeek(t *testing.T) {
+	checkList := []string{"*", "1", "2,3,4", "1-2", "*/1", "1/1,2", "1,2/1", "1-2/1"}
+	wantList := []string{
+		"",
+		"on Monday",
+		"on Tuesday and Wednesday and Thursday",
+		"on every day from Monday through Tuesday",
+		"on every 1 day of week",
+		"on every 1,2 day of week from Monday",
+		"on every 1 day of week from Monday and Tuesday",
+		"on every 1 day of week between Monday and Tuesday",
+	}
+	for i := range checkList {
+		got := explainDayWeek(CheckDayWeekReg(checkList[i]))
+		want := wantList[i]
+		if got != want {
+			t.Errorf("Got: %s, but want: %s", got, want)
+		}
+	}
+}
 func TestMonthToNum(t *testing.T) {
 	checkList := []string{"Jan", "FEB", "March", "APr", "MaY", "june", "July", "Aug", "Sep", "Oct", "Nov", "Dec"}
 	wantList := []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"}

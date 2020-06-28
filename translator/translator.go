@@ -81,7 +81,6 @@ func checkFieldPattern(str string, patternList map[string]string) (bool, string)
 	return valid, pattern
 }
 
-// [TODO] Add slash format check
 // check the logic and format in some pattern
 func numLogicFormat(input string, pattern string) (bool, string) {
 	valid := true
@@ -256,6 +255,7 @@ func explainMinute(c *CheckResult) string {
 		slice := strings.Split(minute, "/")
 		for i, v := range slice {
 			CheckResult := CheckMinuteReg(v)
+			// check the left side of slash
 			if i == 0 {
 				switch CheckResult.Pattern {
 				case "asterisk":
@@ -282,6 +282,7 @@ func explainMinute(c *CheckResult) string {
 					output += " from minute " + strings.Replace(minute, "-", " through minute ", 1)
 				}
 			} else {
+				// check the right side of slash
 				// for pattern "number" and "comma"
 				output = CheckResult.Input + " minute" + output
 			}
@@ -320,6 +321,7 @@ func explainHour(c *CheckResult) string {
 		slice := strings.Split(hour, "/")
 		for i, v := range slice {
 			CheckResult := CheckHourReg(v)
+			// check the left side of slash
 			if i == 0 {
 				switch CheckResult.Pattern {
 				case "asterisk":
@@ -342,6 +344,7 @@ func explainHour(c *CheckResult) string {
 					output += " from " + strings.Join(slice, "-")
 				}
 			} else {
+				// check the right side of slash
 				// for pattern "number" and "comma"
 				switch CheckResult.Pattern {
 				case "number":
@@ -382,6 +385,7 @@ func explainDayMonth(c *CheckResult) string {
 		slice := strings.Split(dayM, "/")
 		for i, v := range slice {
 			CheckResult := CheckDayMonthReg(v)
+			// check the left side of slash
 			if i == 0 {
 				switch CheckResult.Pattern {
 				case "asterisk":
@@ -404,6 +408,7 @@ func explainDayMonth(c *CheckResult) string {
 					output += " between " + strings.Join(slice, " and ") + " of the month"
 				}
 			} else {
+				// check the right side of slash
 				// for pattern "number" and "comma"
 				output = "every " + CheckResult.Input + " day of month" + output
 			}
@@ -443,6 +448,7 @@ func explainMonth(c *CheckResult) string {
 		slice := strings.Split(month, "/")
 		for i, v := range slice {
 			CheckResult := CheckMonthReg(v)
+			// check the left side of slash
 			if i == 0 {
 				switch CheckResult.Pattern {
 				case "asterisk":
@@ -466,6 +472,7 @@ func explainMonth(c *CheckResult) string {
 					output += " from " + strings.Join(slice, " through ")
 				}
 			} else {
+				// check the right side of slash
 				// for pattern "number" and "comma"
 				output = "every " + CheckResult.Input + " month" + output
 			}
@@ -505,6 +512,7 @@ func explainDayWeek(c *CheckResult) string {
 		slice := strings.Split(dayW, "/")
 		for i, v := range slice {
 			CheckResult := CheckDayWeekReg(v)
+			// check the left side of slash
 			if i == 0 {
 				switch CheckResult.Pattern {
 				case "asterisk":
@@ -530,6 +538,7 @@ func explainDayWeek(c *CheckResult) string {
 					output += " between " + strings.Join(slice, " and ")
 				}
 			} else {
+				// check the right side of slash
 				// for pattern "number" and "comma"
 				output = "every " + CheckResult.Input + " day of week" + output
 			}
