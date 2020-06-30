@@ -255,6 +255,7 @@ func executor(in string) {
 
 func completer(in prompt.Document) []prompt.Suggest {
 	args := strings.Split(in.TextBeforeCursor(), " ")
+	var suggest []prompt.Suggest
 	if len(args) <= 1 {
 		return prompt.FilterHasPrefix(scheduleTypeSuggest, args[0], true)
 	}
@@ -267,19 +268,16 @@ func completer(in prompt.Document) []prompt.Suggest {
 			return prompt.FilterHasPrefix(timeAdposition, second, true)
 		}
 		third := args[2]
-		switch second {
-		case "at":
-			if len(args) == 3 {
-				return prompt.FilterHasPrefix(makeTimeSuggest("time"), third, true)
+		if len(args) == 3 {
+			switch second {
+			case "at":
+				suggest = makeTimeSuggest("time")
+			case "every_minute":
+				suggest = makeTimeSuggest("minute")
+			case "every_hour":
+				suggest = makeTimeSuggest("hour")
 			}
-		case "every_minute":
-			if len(args) == 3 {
-				return prompt.FilterHasPrefix(makeTimeSuggest("minute"), third, true)
-			}
-		case "every_hour":
-			if len(args) == 3 {
-				return prompt.FilterHasPrefix(makeTimeSuggest("hour"), third, true)
-			}
+			return prompt.FilterHasPrefix(suggest, third, true)
 		}
 	case "Daily_schedule:":
 		second := args[1]
