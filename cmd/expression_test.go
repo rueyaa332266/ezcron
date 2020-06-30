@@ -9,9 +9,9 @@ import (
 	"github.com/rueyaa332266/ezcron/translator"
 )
 
-func TestMakeTimeSuggest(t *testing.T) {
+func TestMakeTimeSuggest_Time(t *testing.T) {
 	var want []prompt.Suggest
-	got := makeTimeSuggest()
+	got := makeTimeSuggest("time")
 	for h := 0; h <= 23; h++ {
 		for m := 0; m <= 59; m++ {
 			min := translator.AddZeorforTenDigit(strconv.Itoa(m))
@@ -25,9 +25,9 @@ func TestMakeTimeSuggest(t *testing.T) {
 	}
 }
 
-func TestMakeMinuteSuggest(t *testing.T) {
+func TestMakeTimeSuggest_Minute(t *testing.T) {
 	var want []prompt.Suggest
-	got := makeMinuteSuggest()
+	got := makeTimeSuggest("minute")
 	for m := 1; m < 61; m++ {
 		min := strconv.Itoa(m)
 		suggest := prompt.Suggest{Text: min + "_minute"}
@@ -38,9 +38,9 @@ func TestMakeMinuteSuggest(t *testing.T) {
 	}
 }
 
-func TestMakeHourSuggest(t *testing.T) {
+func TestMakeTimeSuggest_Hour(t *testing.T) {
 	var want []prompt.Suggest
-	got := makeHourSuggest()
+	got := makeTimeSuggest("hour")
 	for h := 1; h < 25; h++ {
 		hour := strconv.Itoa(h)
 		suggest := prompt.Suggest{Text: hour + "_hour"}

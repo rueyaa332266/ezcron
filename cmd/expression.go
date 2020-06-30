@@ -24,38 +24,32 @@ var dayWList = []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", 
 var monthList = []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 var dayMList []string
 
-func makeTimeSuggest() []prompt.Suggest {
+func makeTimeSuggest(t string) []prompt.Suggest {
 	var timeSuggest []prompt.Suggest
+	var suggest prompt.Suggest
 	for i := 0; i < 24; i++ {
-		for j := 0; j < 60; j++ {
-			hour := translator.AddZeorforTenDigit(strconv.Itoa(i))
-			minute := translator.AddZeorforTenDigit(strconv.Itoa(j))
-			suggest := prompt.Suggest{Text: hour + ":" + minute}
+		if t == "minute" && i > 0 {
+			break
+		} else if t == "hour" {
+			hour := strconv.Itoa(i + 1)
+			suggest = prompt.Suggest{Text: hour + "_hour"}
 			timeSuggest = append(timeSuggest, suggest)
 		}
-
+		for j := 0; j < 60; j++ {
+			if t == "hour" {
+				break
+			} else if t == "minute" {
+				minute := strconv.Itoa(j + 1)
+				suggest = prompt.Suggest{Text: minute + "_minute"}
+			} else if t == "time" {
+				hour := translator.AddZeorforTenDigit(strconv.Itoa(i))
+				minute := translator.AddZeorforTenDigit(strconv.Itoa(j))
+				suggest = prompt.Suggest{Text: hour + ":" + minute}
+			}
+			timeSuggest = append(timeSuggest, suggest)
+		}
 	}
 	return timeSuggest
-}
-
-func makeMinuteSuggest() []prompt.Suggest {
-	var minuteSuggest []prompt.Suggest
-	for i := 1; i <= 60; i++ {
-		minute := strconv.Itoa(i)
-		suggest := prompt.Suggest{Text: minute + "_minute"}
-		minuteSuggest = append(minuteSuggest, suggest)
-	}
-	return minuteSuggest
-}
-
-func makeHourSuggest() []prompt.Suggest {
-	var hourSuggest []prompt.Suggest
-	for i := 1; i <= 24; i++ {
-		hour := strconv.Itoa(i)
-		suggest := prompt.Suggest{Text: hour + "_hour"}
-		hourSuggest = append(hourSuggest, suggest)
-	}
-	return hourSuggest
 }
 
 func makeWeekdaySuggest() []prompt.Suggest {
@@ -276,15 +270,15 @@ func completer(in prompt.Document) []prompt.Suggest {
 		switch second {
 		case "at":
 			if len(args) == 3 {
-				return prompt.FilterHasPrefix(makeTimeSuggest(), third, true)
+				return prompt.FilterHasPrefix(makeTimeSuggest("time"), third, true)
 			}
 		case "every_minute":
 			if len(args) == 3 {
-				return prompt.FilterHasPrefix(makeMinuteSuggest(), third, true)
+				return prompt.FilterHasPrefix(makeTimeSuggest("minute"), third, true)
 			}
 		case "every_hour":
 			if len(args) == 3 {
-				return prompt.FilterHasPrefix(makeHourSuggest(), third, true)
+				return prompt.FilterHasPrefix(makeTimeSuggest("hour"), third, true)
 			}
 		}
 	case "Daily_schedule:":
@@ -295,7 +289,7 @@ func completer(in prompt.Document) []prompt.Suggest {
 		}
 		third := args[2]
 		if second == "every_day_at" && len(args) == 3 {
-			return prompt.FilterHasPrefix(makeTimeSuggest(), third, true)
+			return prompt.FilterHasPrefix(makeTimeSuggest("time"), third, true)
 		}
 	case "Weekly_schedule:":
 		second := args[1]
@@ -315,7 +309,7 @@ func completer(in prompt.Document) []prompt.Suggest {
 				}
 				fifth := args[4]
 				if fourth == "at" && len(args) == 5 {
-					return prompt.FilterHasPrefix(makeTimeSuggest(), fifth, true)
+					return prompt.FilterHasPrefix(makeTimeSuggest("time"), fifth, true)
 				}
 			}
 		}
@@ -343,7 +337,7 @@ func completer(in prompt.Document) []prompt.Suggest {
 					}
 					sixth := args[5]
 					if fifth == "at" && len(args) == 6 {
-						return prompt.FilterHasPrefix(makeTimeSuggest(), sixth, true)
+						return prompt.FilterHasPrefix(makeTimeSuggest("time"), sixth, true)
 					}
 				case "of_every":
 					if len(args) == 5 {
@@ -356,7 +350,7 @@ func completer(in prompt.Document) []prompt.Suggest {
 						}
 						seventh := args[6]
 						if sixth == "at" && len(args) == 7 {
-							return prompt.FilterHasPrefix(makeTimeSuggest(), seventh, true)
+							return prompt.FilterHasPrefix(makeTimeSuggest("time"), seventh, true)
 						}
 					}
 				}
@@ -409,7 +403,7 @@ func completer(in prompt.Document) []prompt.Suggest {
 					}
 					sixth := args[5]
 					if fifth == "at" && len(args) == 6 {
-						return prompt.FilterHasPrefix(makeTimeSuggest(), sixth, true)
+						return prompt.FilterHasPrefix(makeTimeSuggest("time"), sixth, true)
 					}
 				}
 			}
