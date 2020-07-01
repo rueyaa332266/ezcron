@@ -1,4 +1,8 @@
 # Ezcron
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/rueyaa332266/ezcron)](https://goreportcard.com/report/github.com/rueyaa332266/ezcron)
+![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)
+
 Create cron expression like a boss 😎
 
 ## DEMO
