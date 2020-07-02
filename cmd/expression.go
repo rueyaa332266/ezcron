@@ -299,7 +299,7 @@ func completeTimeSchedule(args []string) ([]prompt.Suggest, string) {
 	sub := args[1]
 	if len(args) == 2 {
 		suggest = []prompt.Suggest{{Text: "at", Description: "__:__ every day"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}}
-		goto RETURN
+		return suggest, sub
 	}
 	sub = args[2]
 	if len(args) == 3 {
@@ -312,7 +312,6 @@ func completeTimeSchedule(args []string) ([]prompt.Suggest, string) {
 			suggest = makeTimeSuggest("hour")
 		}
 	}
-RETURN:
 	return suggest, sub
 }
 
@@ -321,13 +320,12 @@ func completeDailySchedule(args []string) ([]prompt.Suggest, string) {
 	sub := args[1]
 	if len(args) == 2 {
 		suggest = []prompt.Suggest{{Text: "every_day", Description: "every day at 00:00"}, {Text: "every_day_at", Description: "every day at __:__"}}
-		goto RETURN
+		return suggest, sub
 	}
 	sub = args[2]
 	if len(args) == 3 {
 		suggest = makeSuggestByPreWord(args[1])
 	}
-RETURN:
 	return suggest, sub
 }
 
@@ -336,19 +334,19 @@ func completeWeeklySchedule(args []string) ([]prompt.Suggest, string) {
 	sub := args[1]
 	if len(args) == 2 {
 		suggest = []prompt.Suggest{{Text: "on_every", Description: "weekday"}}
-		goto RETURN
+		return suggest, sub
 	}
 	sub = args[2]
 	if args[1] == "on_every" {
 		if len(args) == 3 {
 			suggest = makeWeekdaySuggest()
-			goto RETURN
+			return suggest, sub
 		}
 		sub = args[3]
 		if contains(dayWList, args[2]) {
 			if len(args) == 4 {
 				suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
-				goto RETURN
+				return suggest, sub
 			}
 			sub = args[4]
 			if len(args) == 5 {
@@ -356,7 +354,6 @@ func completeWeeklySchedule(args []string) ([]prompt.Suggest, string) {
 			}
 		}
 	}
-RETURN:
 	return suggest, sub
 }
 
@@ -365,42 +362,42 @@ func completeMonthlySchedule(args []string) ([]prompt.Suggest, string) {
 	sub := args[1]
 	if len(args) == 2 {
 		suggest = []prompt.Suggest{{Text: "on", Description: "monthday"}}
-		goto RETURN
+		return suggest, sub
 	}
 	sub = args[2]
 	if args[1] == "on" {
 		if len(args) == 3 {
 			suggest = makeMonthdaySuggest()
-			goto RETURN
+			return suggest, sub
 		}
 		sub = args[3]
 		if strings.Contains(args[2], "_day") {
 			if len(args) == 4 {
 				suggest = []prompt.Suggest{{Text: "of_every_month", Description: "per month, default at 00:00"}, {Text: "of_every", Description: "period of month"}}
-				goto RETURN
+				return suggest, sub
 			}
 			sub = args[4]
 			switch args[3] {
 			case "of_every_month":
 				if len(args) == 5 {
 					suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
-					goto RETURN
+					return suggest, sub
 				}
 				sub = args[5]
 				if len(args) == 6 {
 					suggest = makeSuggestByPreWord(args[4])
-					goto RETURN
+					return suggest, sub
 				}
 			case "of_every":
 				if len(args) == 5 {
 					suggest = makeMonthNumSuggest()
-					goto RETURN
+					return suggest, sub
 				}
 				sub = args[5]
 				if strings.Contains(args[4], "_month") {
 					if len(args) == 6 {
 						suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
-						goto RETURN
+						return suggest, sub
 					}
 					sub = args[6]
 					if len(args) == 7 {
@@ -410,7 +407,6 @@ func completeMonthlySchedule(args []string) ([]prompt.Suggest, string) {
 			}
 		}
 	}
-RETURN:
 	return suggest, sub
 }
 
@@ -419,13 +415,13 @@ func completeYearlySchedule(args []string) ([]prompt.Suggest, string) {
 	sub := args[1]
 	if len(args) == 2 {
 		suggest = []prompt.Suggest{{Text: "in_every", Description: "month_day"}}
-		goto RETURN
+		return suggest, sub
 	}
 	sub = args[2]
 	if args[1] == "in_every" {
 		if len(args) == 3 {
 			suggest = makeMonthSuggest()
-			goto RETURN
+			return suggest, sub
 		}
 		sub = args[3]
 		if contains(monthList, args[2]) {
@@ -455,14 +451,14 @@ func completeYearlySchedule(args []string) ([]prompt.Suggest, string) {
 				default:
 					suggest = f(day)
 				}
-				goto RETURN
+				return suggest, sub
 			}
 			sub = args[4]
 			re := regexp.MustCompile(`^\d{1,2}[a-z]{2}$`)
 			if re.MatchString(args[3]) {
 				if len(args) == 5 {
 					suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
-					goto RETURN
+					return suggest, sub
 				}
 				sub = args[5]
 				if len(args) == 6 {
@@ -471,7 +467,6 @@ func completeYearlySchedule(args []string) ([]prompt.Suggest, string) {
 			}
 		}
 	}
-RETURN:
 	return suggest, sub
 }
 
