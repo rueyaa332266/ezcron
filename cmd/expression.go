@@ -100,157 +100,176 @@ func executor(in string) {
 		return c == ' '
 	}
 	inputs := strings.FieldsFunc(in, f)
-	// fmt.Println(inputs)
 	switch inputs[0] {
 	case "Time_schedule:":
-		if len(inputs) != 3 {
-			fmt.Println("invalid input")
-			os.Exit(1)
-		}
-		last := inputs[len(inputs)-1]
-		re := regexp.MustCompile(`\d\d:\d\d`)
-		if strings.Contains(last, "minute") {
-			fmt.Println("*/" + strings.Split(last, "_")[0] + " * * * *")
-		} else if strings.Contains(last, "hour") {
-			fmt.Println("* */" + strings.Split(last, "_")[0] + " * * *")
-		} else if re.MatchString(last) {
-			time := strings.Split(last, ":")
-			minute := strings.TrimPrefix(time[1], "0")
-			hour := strings.TrimPrefix(time[0], "0")
-			fmt.Println(minute + " " + hour + " * * *")
-		} else {
-			fmt.Println("Time schedule is invalid")
-		}
+		executeTimeSchedule(inputs)
 	case "Daily_schedule:":
-		if len(inputs) != 2 && len(inputs) != 3 {
-			fmt.Println("invalid input")
-			os.Exit(1)
-		}
-		last := inputs[len(inputs)-1]
-		re := regexp.MustCompile(`\d\d:\d\d`)
-		if re.MatchString(last) {
-			time := strings.Split(last, ":")
-			minute := strings.TrimPrefix(time[1], "0")
-			hour := strings.TrimPrefix(time[0], "0")
-			fmt.Println(minute + " " + hour + " */1 * *")
-		} else if last == "every_day" {
-			fmt.Println("0 0 */1 * *")
-		} else {
-			fmt.Println("Daily schedule is invalid")
-		}
+		executeDailySchedule(inputs)
 	case "Weekly_schedule:":
-		last := inputs[len(inputs)-1]
-		if len(inputs) == 5 {
-			weekDay := inputs[len(inputs)-3]
-			re := regexp.MustCompile(`\d\d:\d\d`)
-			if re.MatchString(last) && contains(dayWList, weekDay) {
-				time := strings.Split(last, ":")
-				minute := strings.TrimPrefix(time[1], "0")
-				hour := strings.TrimPrefix(time[0], "0")
-				fmt.Println(minute + " " + hour + " * * " + translator.WeekDayToNum(weekDay))
-			} else {
-				fmt.Println("Weekly schedule is invalid")
-			}
-		} else if len(inputs) == 3 {
-			if contains(dayWList, last) {
-				fmt.Println("0 0 * * " + translator.WeekDayToNum(last))
-			} else {
-				fmt.Println("Weekly schedule is invalid")
-			}
-		} else {
-			fmt.Println("invalid input")
-			os.Exit(1)
-		}
+		executeWeeklySchedule(inputs)
 	case "Monthly_schedule:":
-		last := inputs[len(inputs)-1]
-		if len(inputs) == 7 {
-			monthDay := inputs[2]
-			perMonth := inputs[4]
-			re := regexp.MustCompile(`\d\d:\d\d`)
-			if re.MatchString(last) && strings.Contains(monthDay, "_day") && strings.Contains(perMonth, "_month") {
-				time := strings.Split(last, ":")
-				minute := strings.TrimPrefix(time[1], "0")
-				hour := strings.TrimPrefix(time[0], "0")
-				re := regexp.MustCompile(`\d{1,2}`)
-				monthDay := re.FindAllString(monthDay, 1)[0]
-				perMonth := strings.TrimRight(perMonth, "_month")
-				fmt.Println(minute + " " + hour + " " + monthDay + " */" + perMonth + " *")
-			} else {
-				fmt.Println("Monthly schedule is invalid")
-			}
-		} else if len(inputs) == 6 {
-			monthDay := inputs[2]
-			re := regexp.MustCompile(`\d\d:\d\d`)
-			if re.MatchString(last) && strings.Contains(monthDay, "_day") {
-				time := strings.Split(last, ":")
-				minute := strings.TrimPrefix(time[1], "0")
-				hour := strings.TrimPrefix(time[0], "0")
-				re := regexp.MustCompile(`\d{1,2}`)
-				monthDay := re.FindAllString(monthDay, 1)[0]
-				fmt.Println(minute + " " + hour + " " + monthDay + " */1 *")
-			} else {
-				fmt.Println("Monthly schedule is invalid")
-			}
-		} else if len(inputs) == 5 {
-			monthDay := inputs[2]
-			perMonth := inputs[4]
-			if strings.Contains(monthDay, "_day") && strings.Contains(perMonth, "_month") {
-				re := regexp.MustCompile(`\d{1,2}`)
-				monthDay := re.FindAllString(monthDay, 1)[0]
-				perMonth := strings.TrimRight(perMonth, "_month")
-				fmt.Println("0 0 " + monthDay + " */" + perMonth + " *")
-			} else {
-				fmt.Println("Monthly schedule is invalid")
-			}
-		} else if len(inputs) == 4 {
-			monthDay := inputs[2]
-			if strings.Contains(monthDay, "_day") {
-				re := regexp.MustCompile(`\d{1,2}`)
-				monthDay := re.FindAllString(monthDay, 1)[0]
-				fmt.Println("0 0 " + monthDay + " */1 *")
-			} else {
-				fmt.Println("Monthly schedule is invalid")
-			}
-		} else {
-			fmt.Println("invalid input")
-			os.Exit(1)
-		}
+		executeMonthlySchedule(inputs)
 	case "Yearly_schedule:":
-		last := inputs[len(inputs)-1]
-		if len(inputs) == 6 {
-			month := inputs[2]
-			monthDay := inputs[3]
-			reTime := regexp.MustCompile(`\d\d:\d\d`)
-			reDay := regexp.MustCompile(`^\d{1,2}[a-z]{2}$`)
-			if reTime.MatchString(last) && contains(monthList, month) && reDay.MatchString(monthDay) {
-				time := strings.Split(last, ":")
-				minute := strings.TrimPrefix(time[1], "0")
-				hour := strings.TrimPrefix(time[0], "0")
-				re := regexp.MustCompile(`\d{1,2}`)
-				monthDay := re.FindAllString(monthDay, 1)[0]
-				month := translator.MonthToNum(month)
-				fmt.Println(minute + " " + hour + " " + monthDay + " " + month + " *")
-			} else {
-				fmt.Println("Weekly schedule is invalid")
-			}
-		} else if len(inputs) == 4 {
-			month := inputs[2]
-			monthDay := inputs[3]
-			reDay := regexp.MustCompile(`^\d{1,2}[a-z]{2}$`)
-			if contains(monthList, month) && reDay.MatchString(monthDay) {
-				re := regexp.MustCompile(`\d{1,2}`)
-				monthDay := re.FindAllString(monthDay, 1)[0]
-				month := translator.MonthToNum(month)
-				fmt.Println("0 0 " + monthDay + " " + month + " *")
-			}
-		} else {
-			fmt.Println("invalid input")
-			os.Exit(1)
-		}
+		executeYearlySchedule(inputs)
 	default:
 		fmt.Println("invalid input")
 	}
 	os.Exit(0)
+}
+
+func executeTimeSchedule(inputs []string) {
+	if len(inputs) != 3 {
+		fmt.Println("invalid input")
+		os.Exit(1)
+	}
+	last := inputs[len(inputs)-1]
+	re := regexp.MustCompile(`\d\d:\d\d`)
+	if strings.Contains(last, "minute") {
+		fmt.Println("*/" + strings.Split(last, "_")[0] + " * * * *")
+	} else if strings.Contains(last, "hour") {
+		fmt.Println("* */" + strings.Split(last, "_")[0] + " * * *")
+	} else if re.MatchString(last) {
+		time := strings.Split(last, ":")
+		minute := strings.TrimPrefix(time[1], "0")
+		hour := strings.TrimPrefix(time[0], "0")
+		fmt.Println(minute + " " + hour + " * * *")
+	} else {
+		fmt.Println("Time schedule is invalid")
+	}
+}
+
+func executeDailySchedule(inputs []string) {
+	if len(inputs) != 2 && len(inputs) != 3 {
+		fmt.Println("invalid input")
+		os.Exit(1)
+	}
+	last := inputs[len(inputs)-1]
+	re := regexp.MustCompile(`\d\d:\d\d`)
+	if re.MatchString(last) {
+		time := strings.Split(last, ":")
+		minute := strings.TrimPrefix(time[1], "0")
+		hour := strings.TrimPrefix(time[0], "0")
+		fmt.Println(minute + " " + hour + " */1 * *")
+	} else if last == "every_day" {
+		fmt.Println("0 0 */1 * *")
+	} else {
+		fmt.Println("Daily schedule is invalid")
+	}
+}
+
+func executeWeeklySchedule(inputs []string) {
+	last := inputs[len(inputs)-1]
+	if len(inputs) == 5 {
+		weekDay := inputs[len(inputs)-3]
+		re := regexp.MustCompile(`\d\d:\d\d`)
+		if re.MatchString(last) && contains(dayWList, weekDay) {
+			time := strings.Split(last, ":")
+			minute := strings.TrimPrefix(time[1], "0")
+			hour := strings.TrimPrefix(time[0], "0")
+			fmt.Println(minute + " " + hour + " * * " + translator.WeekDayToNum(weekDay))
+		} else {
+			fmt.Println("Weekly schedule is invalid")
+		}
+	} else if len(inputs) == 3 {
+		if contains(dayWList, last) {
+			fmt.Println("0 0 * * " + translator.WeekDayToNum(last))
+		} else {
+			fmt.Println("Weekly schedule is invalid")
+		}
+	} else {
+		fmt.Println("invalid input")
+		os.Exit(1)
+	}
+}
+
+func executeMonthlySchedule(inputs []string) {
+	last := inputs[len(inputs)-1]
+	if len(inputs) == 7 {
+		monthDay := inputs[2]
+		perMonth := inputs[4]
+		re := regexp.MustCompile(`\d\d:\d\d`)
+		if re.MatchString(last) && strings.Contains(monthDay, "_day") && strings.Contains(perMonth, "_month") {
+			time := strings.Split(last, ":")
+			minute := strings.TrimPrefix(time[1], "0")
+			hour := strings.TrimPrefix(time[0], "0")
+			re := regexp.MustCompile(`\d{1,2}`)
+			monthDay := re.FindAllString(monthDay, 1)[0]
+			perMonth := strings.TrimRight(perMonth, "_month")
+			fmt.Println(minute + " " + hour + " " + monthDay + " */" + perMonth + " *")
+		} else {
+			fmt.Println("Monthly schedule is invalid")
+		}
+	} else if len(inputs) == 6 {
+		monthDay := inputs[2]
+		re := regexp.MustCompile(`\d\d:\d\d`)
+		if re.MatchString(last) && strings.Contains(monthDay, "_day") {
+			time := strings.Split(last, ":")
+			minute := strings.TrimPrefix(time[1], "0")
+			hour := strings.TrimPrefix(time[0], "0")
+			re := regexp.MustCompile(`\d{1,2}`)
+			monthDay := re.FindAllString(monthDay, 1)[0]
+			fmt.Println(minute + " " + hour + " " + monthDay + " */1 *")
+		} else {
+			fmt.Println("Monthly schedule is invalid")
+		}
+	} else if len(inputs) == 5 {
+		monthDay := inputs[2]
+		perMonth := inputs[4]
+		if strings.Contains(monthDay, "_day") && strings.Contains(perMonth, "_month") {
+			re := regexp.MustCompile(`\d{1,2}`)
+			monthDay := re.FindAllString(monthDay, 1)[0]
+			perMonth := strings.TrimRight(perMonth, "_month")
+			fmt.Println("0 0 " + monthDay + " */" + perMonth + " *")
+		} else {
+			fmt.Println("Monthly schedule is invalid")
+		}
+	} else if len(inputs) == 4 {
+		monthDay := inputs[2]
+		if strings.Contains(monthDay, "_day") {
+			re := regexp.MustCompile(`\d{1,2}`)
+			monthDay := re.FindAllString(monthDay, 1)[0]
+			fmt.Println("0 0 " + monthDay + " */1 *")
+		} else {
+			fmt.Println("Monthly schedule is invalid")
+		}
+	} else {
+		fmt.Println("invalid input")
+		os.Exit(1)
+	}
+}
+
+func executeYearlySchedule(inputs []string) {
+	last := inputs[len(inputs)-1]
+	if len(inputs) == 6 {
+		month := inputs[2]
+		monthDay := inputs[3]
+		reTime := regexp.MustCompile(`\d\d:\d\d`)
+		reDay := regexp.MustCompile(`^\d{1,2}[a-z]{2}$`)
+		if reTime.MatchString(last) && contains(monthList, month) && reDay.MatchString(monthDay) {
+			time := strings.Split(last, ":")
+			minute := strings.TrimPrefix(time[1], "0")
+			hour := strings.TrimPrefix(time[0], "0")
+			re := regexp.MustCompile(`\d{1,2}`)
+			monthDay := re.FindAllString(monthDay, 1)[0]
+			month := translator.MonthToNum(month)
+			fmt.Println(minute + " " + hour + " " + monthDay + " " + month + " *")
+		} else {
+			fmt.Println("Weekly schedule is invalid")
+		}
+	} else if len(inputs) == 4 {
+		month := inputs[2]
+		monthDay := inputs[3]
+		reDay := regexp.MustCompile(`^\d{1,2}[a-z]{2}$`)
+		if contains(monthList, month) && reDay.MatchString(monthDay) {
+			re := regexp.MustCompile(`\d{1,2}`)
+			monthDay := re.FindAllString(monthDay, 1)[0]
+			month := translator.MonthToNum(month)
+			fmt.Println("0 0 " + monthDay + " " + month + " *")
+		}
+	} else {
+		fmt.Println("invalid input")
+		os.Exit(1)
+	}
 }
 
 func completer(in prompt.Document) []prompt.Suggest {
