@@ -38,6 +38,7 @@ func init() {
 	rootCmd.AddCommand(cmdExpression)
 }
 
+// Execute for cobra
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

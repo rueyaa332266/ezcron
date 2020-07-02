@@ -21,14 +21,12 @@ func nextExecTime(cronExpression string) (time.Time, error) {
 		if err != nil {
 			fmt.Println(cronExpression, "invalid syntax")
 			return time.Now(), err
-		} else {
-			return sched.Next(time.Now()), nil
 		}
-	} else {
-		fmt.Println(cronExpression, "invalid syntax")
-		err := errors.New("invalid syntax")
-		return time.Now(), err
+		return sched.Next(time.Now()), nil
 	}
+	fmt.Println(cronExpression, "invalid syntax")
+	err := errors.New("invalid syntax")
+	return time.Now(), err
 }
 
 var cmdNext = &cobra.Command{
