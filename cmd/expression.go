@@ -262,165 +262,204 @@ func completer(in prompt.Document) []prompt.Suggest {
 	}
 	switch args[0] {
 	case "Time_schedule:":
-		sub = args[1]
-		if len(args) == 2 {
-			suggest = []prompt.Suggest{{Text: "at", Description: "__:__ every day"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}}
-			break
-		}
-		sub = args[2]
-		if len(args) == 3 {
-			switch args[1] {
-			case "at":
-				suggest = makeTimeSuggest("time")
-			case "every_minute":
-				suggest = makeTimeSuggest("minute")
-			case "every_hour":
-				suggest = makeTimeSuggest("hour")
-			}
-		}
+		suggest, sub = completeTimeSchedule(args)
 	case "Daily_schedule:":
-		sub = args[1]
-		if len(args) == 2 {
-			suggest = []prompt.Suggest{{Text: "every_day", Description: "every day at 00:00"}, {Text: "every_day_at", Description: "every day at __:__"}}
-			break
-		}
-		sub = args[2]
-		if args[1] == "every_day_at" && len(args) == 3 {
-			suggest = makeTimeSuggest("time")
-		}
+		suggest, sub = completeDailySchedule(args)
 	case "Weekly_schedule:":
-		sub = args[1]
-		if len(args) == 2 {
-			suggest = []prompt.Suggest{{Text: "on_every", Description: "weekday"}}
-			break
-		}
-		sub = args[2]
-		if args[1] == "on_every" {
-			if len(args) == 3 {
-				suggest = makeWeekdaySuggest()
-				break
-			}
-			sub = args[3]
-			if contains(dayWList, args[2]) {
-				if len(args) == 4 {
-					suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
-					break
-				}
-				sub = args[4]
-				if args[3] == "at" && len(args) == 5 {
-					suggest = makeTimeSuggest("time")
-					break
-				}
-			}
-		}
+		suggest, sub = completeWeeklySchedule(args)
 	case "Monthly_schedule:":
-		sub = args[1]
-		if len(args) == 2 {
-			suggest = []prompt.Suggest{{Text: "on", Description: "monthday"}}
-			break
-		}
-		sub = args[2]
-		if args[1] == "on" {
-			if len(args) == 3 {
-				suggest = makeMonthdaySuggest()
-				break
-			}
-			sub = args[3]
-			if strings.Contains(args[2], "_day") {
-				if len(args) == 4 {
-					suggest = []prompt.Suggest{{Text: "of_every_month", Description: "per month, default at 00:00"}, {Text: "of_every", Description: "period of month"}}
-					break
-				}
-				sub = args[4]
-				switch args[3] {
-				case "of_every_month":
-					if len(args) == 5 {
-						suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
-						break
-					}
-					sub = args[5]
-					if args[4] == "at" && len(args) == 6 {
-						suggest = makeTimeSuggest("time")
-						break
-					}
-				case "of_every":
-					if len(args) == 5 {
-						suggest = makeMonthNumSuggest()
-						break
-					}
-					sub = args[5]
-					if strings.Contains(args[4], "_month") {
-						if len(args) == 6 {
-							suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
-							break
-						}
-						sub = args[6]
-						if args[5] == "at" && len(args) == 7 {
-							suggest = makeTimeSuggest("time")
-						}
-					}
-				}
-			}
-		}
+		suggest, sub = completeMonthlySchedule(args)
 	case "Yearly_schedule:":
-		sub = args[1]
-		if len(args) == 2 {
-			suggest = []prompt.Suggest{{Text: "in_every", Description: "month_day"}}
-			break
+		suggest, sub = completeYearlySchedule(args)
+	}
+	return prompt.FilterHasPrefix(suggest, sub, true)
+}
+
+func completeTimeSchedule(args []string) ([]prompt.Suggest, string) {
+	var suggest []prompt.Suggest
+	sub := args[1]
+	if len(args) == 2 {
+		suggest = []prompt.Suggest{{Text: "at", Description: "__:__ every day"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}}
+		return suggest, sub
+	}
+	sub = args[2]
+	if len(args) == 3 {
+		switch args[1] {
+		case "at":
+			suggest = makeTimeSuggest("time")
+		case "every_minute":
+			suggest = makeTimeSuggest("minute")
+		case "every_hour":
+			suggest = makeTimeSuggest("hour")
 		}
-		sub = args[2]
-		if args[1] == "in_every" {
-			if len(args) == 3 {
-				suggest = makeMonthSuggest()
-				break
+	}
+	return suggest, sub
+}
+
+func completeDailySchedule(args []string) ([]prompt.Suggest, string) {
+	var suggest []prompt.Suggest
+	sub := args[1]
+	if len(args) == 2 {
+		suggest = []prompt.Suggest{{Text: "every_day", Description: "every day at 00:00"}, {Text: "every_day_at", Description: "every day at __:__"}}
+		return suggest, sub
+	}
+	sub = args[2]
+	if len(args) == 3 {
+		suggest = makeSuggestByPreWord(args[1])
+	}
+	return suggest, sub
+}
+
+func completeWeeklySchedule(args []string) ([]prompt.Suggest, string) {
+	var suggest []prompt.Suggest
+	sub := args[1]
+	if len(args) == 2 {
+		suggest = []prompt.Suggest{{Text: "on_every", Description: "weekday"}}
+		return suggest, sub
+	}
+	sub = args[2]
+	if args[1] == "on_every" {
+		if len(args) == 3 {
+			suggest = makeWeekdaySuggest()
+			return suggest, sub
+		}
+		sub = args[3]
+		if contains(dayWList, args[2]) {
+			if len(args) == 4 {
+				suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
+				return suggest, sub
 			}
-			sub = args[3]
-			if contains(monthList, args[2]) {
-				if len(args) == 4 {
-					// make date 28 30 31
-					var day []string
-					for i := 1; i < 32; i++ {
-						day = append(day, strconv.Itoa(i))
-					}
-					day28 := day[:28]
-					day30 := day[:30]
-					f := func(src []string) []prompt.Suggest {
-						var suggests []prompt.Suggest
-						for _, v := range src {
-							suggest := prompt.Suggest{Text: translator.OrdinalFromStr(v), Description: "default at 00:00"}
-							suggests = append(suggests, suggest)
-						}
-						return suggests
-					}
-					switch args[2] {
-					case "February":
-						suggest = f(day28)
-						break
-					case "April", "June", "September", "November":
-						suggest = f(day30)
-						break
-					default:
-						suggest = f(day)
-					}
-					break
+			sub = args[4]
+			if len(args) == 5 {
+				suggest = makeSuggestByPreWord(args[3])
+			}
+		}
+	}
+	return suggest, sub
+}
+
+func completeMonthlySchedule(args []string) ([]prompt.Suggest, string) {
+	var suggest []prompt.Suggest
+	sub := args[1]
+	if len(args) == 2 {
+		suggest = []prompt.Suggest{{Text: "on", Description: "monthday"}}
+		return suggest, sub
+	}
+	sub = args[2]
+	if args[1] == "on" {
+		if len(args) == 3 {
+			suggest = makeMonthdaySuggest()
+			return suggest, sub
+		}
+		sub = args[3]
+		if strings.Contains(args[2], "_day") {
+			if len(args) == 4 {
+				suggest = []prompt.Suggest{{Text: "of_every_month", Description: "per month, default at 00:00"}, {Text: "of_every", Description: "period of month"}}
+				return suggest, sub
+			}
+			sub = args[4]
+			switch args[3] {
+			case "of_every_month":
+				if len(args) == 5 {
+					suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
+					return suggest, sub
 				}
-				sub = args[4]
-				re := regexp.MustCompile(`^\d{1,2}[a-z]{2}$`)
-				if re.MatchString(args[3]) {
-					if len(args) == 5 {
+				sub = args[5]
+				if len(args) == 6 {
+					suggest = makeSuggestByPreWord(args[4])
+					return suggest, sub
+				}
+			case "of_every":
+				if len(args) == 5 {
+					suggest = makeMonthNumSuggest()
+					return suggest, sub
+				}
+				sub = args[5]
+				if strings.Contains(args[4], "_month") {
+					if len(args) == 6 {
 						suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
-						break
+						return suggest, sub
 					}
-					sub = args[5]
-					if args[4] == "at" && len(args) == 6 {
-						suggest = makeTimeSuggest("time")
+					sub = args[6]
+					if len(args) == 7 {
+						suggest = makeSuggestByPreWord(args[5])
 					}
 				}
 			}
 		}
 	}
-	return prompt.FilterHasPrefix(suggest, sub, true)
+	return suggest, sub
 }
+
+func completeYearlySchedule(args []string) ([]prompt.Suggest, string) {
+	var suggest []prompt.Suggest
+	sub := args[1]
+	if len(args) == 2 {
+		suggest = []prompt.Suggest{{Text: "in_every", Description: "month_day"}}
+		return suggest, sub
+	}
+	sub = args[2]
+	if args[1] == "in_every" {
+		if len(args) == 3 {
+			suggest = makeMonthSuggest()
+			return suggest, sub
+		}
+		sub = args[3]
+		if contains(monthList, args[2]) {
+			if len(args) == 4 {
+				// make date 28 30 31
+				var day []string
+				for i := 1; i < 32; i++ {
+					day = append(day, strconv.Itoa(i))
+				}
+				day28 := day[:28]
+				day30 := day[:30]
+				f := func(src []string) []prompt.Suggest {
+					var suggests []prompt.Suggest
+					for _, v := range src {
+						suggest := prompt.Suggest{Text: translator.OrdinalFromStr(v), Description: "default at 00:00"}
+						suggests = append(suggests, suggest)
+					}
+					return suggests
+				}
+				switch args[2] {
+				case "February":
+					suggest = f(day28)
+					break
+				case "April", "June", "September", "November":
+					suggest = f(day30)
+					break
+				default:
+					suggest = f(day)
+				}
+				return suggest, sub
+			}
+			sub = args[4]
+			re := regexp.MustCompile(`^\d{1,2}[a-z]{2}$`)
+			if re.MatchString(args[3]) {
+				if len(args) == 5 {
+					suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
+					return suggest, sub
+				}
+				sub = args[5]
+				if len(args) == 6 {
+					suggest = makeSuggestByPreWord(args[4])
+				}
+			}
+		}
+	}
+	return suggest, sub
+}
+
+func makeSuggestByPreWord(pre string) []prompt.Suggest {
+	var suggest []prompt.Suggest
+	switch pre {
+	case "at", "every_day_at":
+		suggest = makeTimeSuggest("time")
+	}
+	return suggest
+}
+
 func contains(slice []string, str string) bool {
 	for _, v := range slice {
 		if v == str {
