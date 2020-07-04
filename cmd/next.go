@@ -19,13 +19,13 @@ func nextExecTime(cronExpression string) (time.Time, error) {
 		cronExpression = translator.WeekDayToNum(cronExpression)
 		sched, err := cron.ParseStandard(cronExpression)
 		if err != nil {
-			fmt.Println(cronExpression, "invalid syntax")
+			fmt.Println(cronExpression, "Invalid syntax")
 			return time.Now(), err
 		}
 		return sched.Next(time.Now()), nil
 	}
-	fmt.Println(cronExpression, "invalid syntax")
-	err := errors.New("invalid syntax")
+	fmt.Println(cronExpression, "Invalid syntax")
+	err := errors.New("Invalid syntax")
 	return time.Now(), err
 }
 
