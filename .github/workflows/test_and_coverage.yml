@@ -19,6 +19,7 @@ jobs:
     - name: Test & publish code coverage
       uses: paambaati/codeclimate-action@v2.6.0
       with:
+        prefix: "github.com/rueyaa332266"
         coverageCommand: go test ./cmd ./translator -coverprofile c.out
     # - name: Setup CodeClimate test-report
     #   run: |
