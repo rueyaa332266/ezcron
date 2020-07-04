@@ -16,20 +16,20 @@ jobs:
         go-version: 1.14
     - name: Check out source code
       uses: actions/checkout@v2
-    - name: Test & publish code coverage
-      uses: paambaati/codeclimate-action@v2.6.0
-      with:
-        prefix: "github.com/rueyaa332266"
-        coverageCommand: go test ./cmd ./translator -coverprofile c.out
-    # - name: Setup CodeClimate test-report
-    #   run: |
-    #     curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-    #     chmod +x ./cc-test-reporter
-    #     ./cc-test-reporter before-build
-    # - name: Execute test
-    #   run: |
-    #     go test ./cmd ./translator -coverprofile c.out
-    # - name: After-build test-report
-    #   run: |
-    #     ls -a
-    #     ./cc-test-reporter after-build -d --exit-code $?
+    # - name: Test & publish code coverage
+    #   uses: paambaati/codeclimate-action@v2.6.0
+    #   with:
+    #     prefix: "github.com/rueyaa332266"
+    #     coverageCommand: go test ./cmd ./translator -coverprofile c.out
+    - name: Setup CodeClimate test-report
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        chmod +x ./cc-test-reporter
+        ./cc-test-reporter before-build
+    - name: Execute test
+      run: |
+        go test ./cmd ./translator -coverprofile c.out
+    - name: After-build test-report
+      run: |
+        ls -a
+        ./cc-test-reporter after-build -p "github.com/rueyaa332266/ezcron" -d --exit-code $?
