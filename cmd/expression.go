@@ -118,42 +118,42 @@ func executor(in string) {
 }
 
 func executeTimeSchedule(inputs []string) {
-	if len(inputs) != 3 {
-		fmt.Println("invalid input")
-		os.Exit(1)
-	}
-	last := inputs[len(inputs)-1]
-	re := regexp.MustCompile(`\d\d:\d\d`)
-	if strings.Contains(last, "minute") {
-		fmt.Println("*/" + strings.Split(last, "_")[0] + " * * * *")
-	} else if strings.Contains(last, "hour") {
-		fmt.Println("* */" + strings.Split(last, "_")[0] + " * * *")
-	} else if re.MatchString(last) {
-		time := strings.Split(last, ":")
-		minute := strings.TrimPrefix(time[1], "0")
-		hour := strings.TrimPrefix(time[0], "0")
-		fmt.Println(minute + " " + hour + " * * *")
+	if len(inputs) == 3 {
+		last := inputs[len(inputs)-1]
+		re := regexp.MustCompile(`\d\d:\d\d`)
+		if strings.Contains(last, "minute") {
+			fmt.Println("*/" + strings.Split(last, "_")[0] + " * * * *")
+		} else if strings.Contains(last, "hour") {
+			fmt.Println("* */" + strings.Split(last, "_")[0] + " * * *")
+		} else if re.MatchString(last) {
+			time := strings.Split(last, ":")
+			minute := strings.TrimPrefix(time[1], "0")
+			hour := strings.TrimPrefix(time[0], "0")
+			fmt.Println(minute + " " + hour + " * * *")
+		} else {
+			fmt.Println("Invalid time schedule")
+		}
 	} else {
-		fmt.Println("Time schedule is invalid")
+		fmt.Println("Invalid time schedule")
 	}
 }
 
 func executeDailySchedule(inputs []string) {
-	if len(inputs) != 2 && len(inputs) != 3 {
-		fmt.Println("invalid input")
-		os.Exit(1)
-	}
-	last := inputs[len(inputs)-1]
-	re := regexp.MustCompile(`\d\d:\d\d`)
-	if re.MatchString(last) {
-		time := strings.Split(last, ":")
-		minute := strings.TrimPrefix(time[1], "0")
-		hour := strings.TrimPrefix(time[0], "0")
-		fmt.Println(minute + " " + hour + " */1 * *")
-	} else if last == "every_day" {
-		fmt.Println("0 0 */1 * *")
+	if len(inputs) == 2 || len(inputs) == 3 {
+		last := inputs[len(inputs)-1]
+		re := regexp.MustCompile(`\d\d:\d\d`)
+		if re.MatchString(last) {
+			time := strings.Split(last, ":")
+			minute := strings.TrimPrefix(time[1], "0")
+			hour := strings.TrimPrefix(time[0], "0")
+			fmt.Println(minute + " " + hour + " */1 * *")
+		} else if last == "every_day" {
+			fmt.Println("0 0 */1 * *")
+		} else {
+			fmt.Println("Invalid daily schedule")
+		}
 	} else {
-		fmt.Println("Daily schedule is invalid")
+		fmt.Println("Invalid daily schedule")
 	}
 }
 
@@ -168,17 +168,16 @@ func executeWeeklySchedule(inputs []string) {
 			hour := strings.TrimPrefix(time[0], "0")
 			fmt.Println(minute + " " + hour + " * * " + translator.WeekDayToNum(weekDay))
 		} else {
-			fmt.Println("Weekly schedule is invalid")
+			fmt.Println("Invalid weekly schedule")
 		}
 	} else if len(inputs) == 3 {
 		if contains(dayWList, last) {
 			fmt.Println("0 0 * * " + translator.WeekDayToNum(last))
 		} else {
-			fmt.Println("Weekly schedule is invalid")
+			fmt.Println("Invalid weekly schedule")
 		}
 	} else {
-		fmt.Println("invalid input")
-		os.Exit(1)
+		fmt.Println("Invalid weekly schedule")
 	}
 }
 
@@ -197,7 +196,7 @@ func executeMonthlySchedule(inputs []string) {
 			perMonth := strings.TrimRight(perMonth, "_month")
 			fmt.Println(minute + " " + hour + " " + monthDay + " */" + perMonth + " *")
 		} else {
-			fmt.Println("Monthly schedule is invalid")
+			fmt.Println("Invalid monthly schedule")
 		}
 	} else if len(inputs) == 6 {
 		monthDay := inputs[2]
@@ -210,7 +209,7 @@ func executeMonthlySchedule(inputs []string) {
 			monthDay := re.FindAllString(monthDay, 1)[0]
 			fmt.Println(minute + " " + hour + " " + monthDay + " */1 *")
 		} else {
-			fmt.Println("Monthly schedule is invalid")
+			fmt.Println("Invalid monthly schedule")
 		}
 	} else if len(inputs) == 5 {
 		monthDay := inputs[2]
@@ -221,7 +220,7 @@ func executeMonthlySchedule(inputs []string) {
 			perMonth := strings.TrimRight(perMonth, "_month")
 			fmt.Println("0 0 " + monthDay + " */" + perMonth + " *")
 		} else {
-			fmt.Println("Monthly schedule is invalid")
+			fmt.Println("Invalid monthly schedule")
 		}
 	} else if len(inputs) == 4 {
 		monthDay := inputs[2]
@@ -230,11 +229,10 @@ func executeMonthlySchedule(inputs []string) {
 			monthDay := re.FindAllString(monthDay, 1)[0]
 			fmt.Println("0 0 " + monthDay + " */1 *")
 		} else {
-			fmt.Println("Monthly schedule is invalid")
+			fmt.Println("Invalid monthly schedule")
 		}
 	} else {
-		fmt.Println("invalid input")
-		os.Exit(1)
+		fmt.Println("Invalid monthly schedule")
 	}
 }
 
@@ -254,7 +252,7 @@ func executeYearlySchedule(inputs []string) {
 			month := translator.MonthToNum(month)
 			fmt.Println(minute + " " + hour + " " + monthDay + " " + month + " *")
 		} else {
-			fmt.Println("Weekly schedule is invalid")
+			fmt.Println("Invalid yearly schedule")
 		}
 	} else if len(inputs) == 4 {
 		month := inputs[2]
@@ -265,10 +263,11 @@ func executeYearlySchedule(inputs []string) {
 			monthDay := re.FindAllString(monthDay, 1)[0]
 			month := translator.MonthToNum(month)
 			fmt.Println("0 0 " + monthDay + " " + month + " *")
+		} else {
+			fmt.Println("Invalid yearly schedule")
 		}
 	} else {
-		fmt.Println("invalid input")
-		os.Exit(1)
+		fmt.Println("Invalid yearly schedule")
 	}
 }
 
@@ -303,14 +302,7 @@ func completeTimeSchedule(args []string) ([]prompt.Suggest, string) {
 	}
 	sub = args[2]
 	if len(args) == 3 {
-		switch args[1] {
-		case "at":
-			suggest = makeTimeSuggest("time")
-		case "every_minute":
-			suggest = makeTimeSuggest("minute")
-		case "every_hour":
-			suggest = makeTimeSuggest("hour")
-		}
+		suggest = makeSuggestByPreWord(args[1])
 	}
 	return suggest, sub
 }
@@ -475,6 +467,10 @@ func makeSuggestByPreWord(pre string) []prompt.Suggest {
 	switch pre {
 	case "at", "every_day_at":
 		suggest = makeTimeSuggest("time")
+	case "every_minute":
+		suggest = makeTimeSuggest("minute")
+	case "every_hour":
+		suggest = makeTimeSuggest("hour")
 	}
 	return suggest
 }

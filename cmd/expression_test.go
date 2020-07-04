@@ -122,12 +122,289 @@ func TestMakeMonthSuggest(t *testing.T) {
 	}
 }
 
-func TestComplete(t *testing.T) {
-	in := prompt.Document{Text: "Wait aaa aaa"}
-	got := completer(in)
-	want := scheduleTypeSuggest
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("Got: %v, but want: %s", got, want)
+func Example_executeTimeSchedule() {
+	checkList := [][]string{
+		{"Time_schedule", "at", "00:00"},
+		{"Time_schedule", "every_minute", "1_minute"},
+		{"Time_schedule", "every_hour", "1_hour"},
+		{"Time_schedule", "test"},
+		{"Time_schedule", "at", "test"},
+	}
+	for i := range checkList {
+		executeTimeSchedule(checkList[i])
+	}
+
+	// Output:
+	// 0 0 * * *
+	// */1 * * * *
+	// * */1 * * *
+	// Invalid time schedule
+	// Invalid time schedule
+}
+
+func Example_executeDailySchedule() {
+	checkList := [][]string{
+		{"Daily_schedule", "every_day"},
+		{"Daily_schedule", "every_day_at", "01:01"},
+		{"Daily_schedule", "every_day_at", "01:01"},
+		{"Daily_schedule"},
+		{"Daily_schedule", "test"},
+	}
+	for i := range checkList {
+		executeDailySchedule(checkList[i])
+	}
+
+	// Output:
+	// 0 0 */1 * *
+	// 1 1 */1 * *
+	// 1 1 */1 * *
+	// Invalid daily schedule
+	// Invalid daily schedule
+}
+
+func Example_executeWeeklySchedule() {
+	checkList := [][]string{
+		{"Weekly_schedule", "on_every", "Sunday"},
+		{"Weekly_schedule", "on_every", "Sunday", "at", "01:01"},
+		{"Weekly_schedule", "test"},
+		{"Weekly_schedule", "on_every", "test"},
+		{"Weekly_schedule", "on_every", "Sunday", "at", "test"},
+	}
+	for i := range checkList {
+		executeWeeklySchedule(checkList[i])
+	}
+
+	// Output:
+	// 0 0 * * 0
+	// 1 1 * * 0
+	// Invalid weekly schedule
+	// Invalid weekly schedule
+	// Invalid weekly schedule
+}
+
+func Example_executeMonthlySchedule() {
+	checkList := [][]string{
+		{"Monthly_schedule", "on", "1st_day", "of_every_month"},
+		{"Monthly_schedule", "on", "1st_day", "of_every", "2_month"},
+		{"Monthly_schedule", "on", "1st_day", "of_every_month", "at", "01:01"},
+		{"Monthly_schedule", "on", "1st_day", "of_every", "2_month", "at", "01:01"},
+		{"Monthly_schedule", "test"},
+		{"Monthly_schedule", "on", "test", "of_every_month"},
+		{"Monthly_schedule", "on", "1st_day", "of_every", "test"},
+		{"Monthly_schedule", "on", "1st_day", "of_every_month", "at", "test"},
+		{"Monthly_schedule", "on", "1st_day", "of_every", "2_month", "at", "test"},
+	}
+	for i := range checkList {
+		executeMonthlySchedule(checkList[i])
+	}
+
+	// Output:
+	// 0 0 1 */1 *
+	// 0 0 1 */2 *
+	// 1 1 1 */1 *
+	// 1 1 1 */2 *
+	// Invalid monthly schedule
+	// Invalid monthly schedule
+	// Invalid monthly schedule
+	// Invalid monthly schedule
+	// Invalid monthly schedule
+}
+
+func Example_executeYearlySchedule() {
+	checkList := [][]string{
+		{"Yearly_schedule", "in_every", "January", "1st"},
+		{"Yearly_schedule", "in_every", "January", "1st", "at", "01:01"},
+		{"Yearly_schedule", "in_every", "January", "test"},
+		{"Yearly_schedule", "in_every", "January", "1st", "at", "test"},
+		{"Yearly_schedule", "test"},
+	}
+	for i := range checkList {
+		executeYearlySchedule(checkList[i])
+	}
+
+	// Output:
+	// 0 0 1 1 *
+	// 1 1 1 1 *
+	// Invalid yearly schedule
+	// Invalid yearly schedule
+	// Invalid yearly schedule
+}
+
+func TestCompleteTimeSchedule(t *testing.T) {
+	// var gotSuggest []prompt.Suggest
+	// var gotSub string
+	checkList := [][]string{
+		{"Time_schedule:", "a"},
+		{"Time_schedule:", "at", "0"},
+		{"Time_schedule:", "every_minute", "1"},
+		{"Time_schedule:", "every_hour", "2"},
+	}
+	wantSuggestList := [][]prompt.Suggest{
+		{{Text: "at", Description: "__:__ every day"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}},
+		makeTimeSuggest("time"),
+		makeTimeSuggest("minute"),
+		makeTimeSuggest("hour"),
+	}
+	wantSubtList := []string{"a", "0", "1", "2"}
+	for i := range checkList {
+		gotSuggest, gotSub := completeTimeSchedule(checkList[i])
+		wantSuggest := wantSuggestList[i]
+		wantSub := wantSubtList[i]
+		if !reflect.DeepEqual(gotSuggest, wantSuggest) {
+			t.Errorf("Got: %v, but want: %s", gotSuggest, wantSuggest)
+		}
+		if !reflect.DeepEqual(gotSub, wantSub) {
+			t.Errorf("Got: %v, but want: %s", gotSub, wantSub)
+		}
+	}
+}
+
+func TestCompleteDailySchedule(t *testing.T) {
+	// var gotSuggest []prompt.Suggest
+	// var gotSub string
+	checkList := [][]string{
+		{"Daily_schedule:", "e"},
+		{"Daily_schedule:", "every_day_at", "1"},
+	}
+	wantSuggestList := [][]prompt.Suggest{
+		{{Text: "every_day", Description: "every day at 00:00"}, {Text: "every_day_at", Description: "every day at __:__"}},
+		makeTimeSuggest("time"),
+	}
+	wantSubtList := []string{"e", "1"}
+	for i := range checkList {
+		gotSuggest, gotSub := completeDailySchedule(checkList[i])
+		wantSuggest := wantSuggestList[i]
+		wantSub := wantSubtList[i]
+		if !reflect.DeepEqual(gotSuggest, wantSuggest) {
+			t.Errorf("Got: %v, but want: %s", gotSuggest, wantSuggest)
+		}
+		if !reflect.DeepEqual(gotSub, wantSub) {
+			t.Errorf("Got: %v, but want: %s", gotSub, wantSub)
+		}
+	}
+}
+
+func TestCompleteWeeklySchedule(t *testing.T) {
+	// var gotSuggest []prompt.Suggest
+	// var gotSub string
+	checkList := [][]string{
+		{"Weekly_schedule:", "o"},
+		{"Weekly_schedule:", "on_every", "S"},
+		{"Weekly_schedule:", "on_every", "Sunday", "a"},
+		{"Weekly_schedule:", "on_every", "Sunday", "at", "1"},
+	}
+	wantSuggestList := [][]prompt.Suggest{
+		{{Text: "on_every", Description: "weekday"}},
+		makeWeekdaySuggest(),
+		{{Text: "at", Description: "__:__"}},
+		makeTimeSuggest("time"),
+	}
+	wantSubtList := []string{"o", "S", "a", "1"}
+	for i := range checkList {
+		gotSuggest, gotSub := completeWeeklySchedule(checkList[i])
+		wantSuggest := wantSuggestList[i]
+		wantSub := wantSubtList[i]
+		if !reflect.DeepEqual(gotSuggest, wantSuggest) {
+			t.Errorf("Got: %v, but want: %s", gotSuggest, wantSuggest)
+		}
+		if !reflect.DeepEqual(gotSub, wantSub) {
+			t.Errorf("Got: %v, but want: %s", gotSub, wantSub)
+		}
+	}
+}
+func TestCompleteMonthlySchedule(t *testing.T) {
+	// var gotSuggest []prompt.Suggest
+	// var gotSub string
+	checkList := [][]string{
+		{"Monthly_schedule:", "o"},
+		{"Monthly_schedule:", "on", "1"},
+		{"Monthly_schedule:", "on", "1st_day", "o"},
+		{"Monthly_schedule:", "on", "1st_day", "of_every_month", "a"},
+		{"Monthly_schedule:", "on", "1st_day", "of_every_month", "at", "1"},
+		{"Monthly_schedule:", "on", "1st_day", "of_every", "1"},
+		{"Monthly_schedule:", "on", "1st_day", "of_every", "1_month", "a"},
+		{"Monthly_schedule:", "on", "1st_day", "of_every", "1_month", "at", "1"},
+	}
+	wantSuggestList := [][]prompt.Suggest{
+		{{Text: "on", Description: "monthday"}},
+		makeMonthdaySuggest(),
+		{{Text: "of_every_month", Description: "per month, default at 00:00"}, {Text: "of_every", Description: "period of month"}},
+		{{Text: "at", Description: "__:__"}},
+		makeTimeSuggest("time"),
+		makeMonthNumSuggest(),
+		{{Text: "at", Description: "__:__"}},
+		makeTimeSuggest("time"),
+	}
+	wantSubtList := []string{"o", "1", "o", "a", "1", "1", "a", "1"}
+	for i := range checkList {
+		gotSuggest, gotSub := completeMonthlySchedule(checkList[i])
+		wantSuggest := wantSuggestList[i]
+		wantSub := wantSubtList[i]
+		if !reflect.DeepEqual(gotSuggest, wantSuggest) {
+			t.Errorf("Got: %v, but want: %s", gotSuggest, wantSuggest)
+		}
+		if !reflect.DeepEqual(gotSub, wantSub) {
+			t.Errorf("Got: %v, but want: %s", gotSub, wantSub)
+		}
+	}
+}
+
+func TestCompletYearlySchedule(t *testing.T) {
+	var day []string
+	for i := 1; i < 32; i++ {
+		day = append(day, strconv.Itoa(i))
+	}
+	day28 := day[:28]
+	day30 := day[:30]
+	f := func(src []string) []prompt.Suggest {
+		var suggests []prompt.Suggest
+		for _, v := range src {
+			suggest := prompt.Suggest{Text: translator.OrdinalFromStr(v), Description: "default at 00:00"}
+			suggests = append(suggests, suggest)
+		}
+		return suggests
+	}
+	checkList := [][]string{
+		{"Yearly_schedule:", "i"},
+		{"Yearly_schedule:", "in_every", "J"},
+		{"Yearly_schedule:", "in_every", "January", "1"},
+		{"Yearly_schedule:", "in_every", "February", "1"},
+		{"Yearly_schedule:", "in_every", "April", "1"},
+		{"Yearly_schedule:", "in_every", "January", "1st", "a"},
+		{"Yearly_schedule:", "in_every", "January", "1st", "at", "1"},
+	}
+	wantSuggestList := [][]prompt.Suggest{
+		{{Text: "in_every", Description: "month_day"}},
+		makeMonthSuggest(),
+		f(day),
+		f(day28),
+		f(day30),
+		{{Text: "at", Description: "__:__"}},
+		makeTimeSuggest("time"),
+	}
+	wantSubtList := []string{"i", "J", "1", "1", "1", "a", "1"}
+	for i := range checkList {
+		gotSuggest, gotSub := completeYearlySchedule(checkList[i])
+		wantSuggest := wantSuggestList[i]
+		wantSub := wantSubtList[i]
+		if !reflect.DeepEqual(gotSuggest, wantSuggest) {
+			t.Errorf("Got: %v, but want: %s", gotSuggest, wantSuggest)
+		}
+		if !reflect.DeepEqual(gotSub, wantSub) {
+			t.Errorf("Got: %v, but want: %s", gotSub, wantSub)
+		}
+	}
+}
+
+func TestMakeSuggestByPreWord(t *testing.T) {
+	checkList := []string{"at", "every_minute", "every_hour"}
+	wantList := [][]prompt.Suggest{makeTimeSuggest("time"), makeTimeSuggest("minute"), makeTimeSuggest("hour")}
+	for i := range checkList {
+		got := makeSuggestByPreWord(checkList[i])
+		want := wantList[i]
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("Got: %v, but want: %s", got, want)
+		}
 	}
 }
 
