@@ -23,7 +23,8 @@ jobs:
         ./cc-test-reporter before-build
     - name: Execute test
       run: |
-        go test ./cmd ./translator -coverprofile=c.out
-    - name: Setup CodeClimate test-report
+        go test ./cmd ./translator -coverprofile c.out
+    - name: After-build test-report
       run: |
-        ./cc-test-reporter after-build --exit-code $?
+        ls -a
+        ./cc-test-reporter after-build -d --exit-code $?
