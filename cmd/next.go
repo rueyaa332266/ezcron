@@ -33,23 +33,25 @@ var cmdNext = &cobra.Command{
 	Use:   "next [cron expression]",
 	Short: "Return next execute time",
 	Long:  `Show the next execute time when inputing cron expression`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// show help message if got no args
-		if len(args) < 1 {
-			err := cmd.Help()
-			if err != nil {
-				fmt.Println(err)
-			}
-			os.Exit(0)
+	Run:   getNextTime,
+}
+
+func getNextTime(cmd *cobra.Command, args []string) {
+	// show help message if got no args
+	if len(args) < 1 {
+		err := cmd.Help()
+		if err != nil {
+			fmt.Println(err)
 		}
-		cronExpression := strings.Join(args, " ")
-		valid, _ := translator.MatchCronReg(cronExpression)
-		if valid {
-			next, _ := nextExecTime(cronExpression)
-			fmt.Println("Next execute time:", next)
-		} else {
-			fmt.Println("invalid syntax")
-			os.Exit(1)
-		}
-	},
+		os.Exit(0)
+	}
+	cronExpression := strings.Join(args, " ")
+	valid, _ := translator.MatchCronReg(cronExpression)
+	if valid {
+		next, _ := nextExecTime(cronExpression)
+		fmt.Println("Next execute time:", next)
+	} else {
+		fmt.Println("invalid syntax")
+		os.Exit(1)
+	}
 }

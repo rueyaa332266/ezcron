@@ -12,24 +12,26 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use: "ezcron",
-	Run: func(cmd *cobra.Command, args []string) {
-		// input from pipe
-		stat, _ := os.Stdin.Stat()
-		if (stat.Mode() & os.ModeCharDevice) == 0 {
-			buf := new(bytes.Buffer)
-			buf.ReadFrom(os.Stdin)
-			cronExpression := strings.TrimSuffix(buf.String(), "\n")
-			valid, result := translator.MatchCronReg(cronExpression)
-			if valid {
-				translator.Explain(result)
-			} else {
-				fmt.Println("invalid syntax")
-				os.Exit(1)
-			}
+	Run: translateFromPipe,
+}
+
+func translateFromPipe(cmd *cobra.Command, args []string) {
+	// input from pipe
+	stat, _ := os.Stdin.Stat()
+	if (stat.Mode() & os.ModeCharDevice) == 0 {
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(os.Stdin)
+		cronExpression := strings.TrimSuffix(buf.String(), "\n")
+		valid, result := translator.MatchCronReg(cronExpression)
+		if valid {
+			translator.Explain(result)
 		} else {
-			cmd.Help()
+			fmt.Println("invalid syntax")
+			os.Exit(1)
 		}
-	},
+	} else {
+		cmd.Help()
+	}
 }
 
 func init() {
