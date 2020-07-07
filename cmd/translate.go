@@ -30,7 +30,6 @@ func translate(cmd *cobra.Command, args []string) {
 	if valid {
 		translator.Explain(checkResult)
 	} else {
-		fmt.Println("invalid syntax")
-		os.Exit(1)
+		fmt.Println("Invalid syntax")
 	}
 }

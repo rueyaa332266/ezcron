@@ -51,7 +51,6 @@ func getNextTime(cmd *cobra.Command, args []string) {
 		next, _ := nextExecTime(cronExpression)
 		fmt.Println("Next execute time:", next)
 	} else {
-		fmt.Println("invalid syntax")
-		os.Exit(1)
+		fmt.Println("Invalid syntax")
 	}
 }

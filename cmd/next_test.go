@@ -3,6 +3,8 @@ package cmd
 import (
 	"testing"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
 func TestNextExecTime(t *testing.T) {
@@ -22,4 +24,12 @@ func TestNextExecTime(t *testing.T) {
 			}
 		}
 	}
+}
+
+func Example_getNextTime() {
+	var cmd *cobra.Command
+	getNextTime(cmd, []string{"*", "*", "*", "*"})
+
+	// Output:
+	// Invalid syntax
 }
