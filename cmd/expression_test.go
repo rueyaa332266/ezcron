@@ -80,7 +80,7 @@ func TestMakeMonthdaySuggest(t *testing.T) {
 	}
 }
 
-func TestmakeMonthdayNumberSuggest(t *testing.T) {
+func TestMakeMonthdayNumberSuggest(t *testing.T) {
 	var want []prompt.Suggest
 	checkList := [][]string{
 		dayList[:28],
