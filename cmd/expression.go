@@ -22,7 +22,6 @@ var scheduleTypeSuggest = []prompt.Suggest{
 
 var dayWList = []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 var monthList = []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
-var dayMList []string
 
 func makeTimeSuggest(t string) []prompt.Suggest {
 	var timeSuggest []prompt.Suggest
@@ -436,10 +435,8 @@ func completeYearlySchedule(args []string) ([]prompt.Suggest, string) {
 				switch args[2] {
 				case "February":
 					suggest = f(day28)
-					break
 				case "April", "June", "September", "November":
 					suggest = f(day30)
-					break
 				default:
 					suggest = f(day)
 				}
