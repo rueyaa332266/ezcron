@@ -6,6 +6,7 @@
 Ezcron is a CLI tool, helping you deal with cron expression easier.
 
 ## Feature
+
 - Creating cron expression with prompts
 - Translate cron expression into human-friendly language
 - Show the next execute time
@@ -19,11 +20,8 @@ Create cron expression like a boss 😎
 
 See more DEMO at [example](#Example)
 
-## TODO
-- Add number option for Next command
-- Refactor the code
-
 ## CRON Expression Format
+
 Only support 5 fields.
 ```
 # ┌───────────── minute (0 - 59)
@@ -52,6 +50,7 @@ go get -u github.com/rueyaa332266/ezcron
 ```
 
 ## Usage
+
 ```
 Usage:
   ezcron [flags]
@@ -138,6 +137,7 @@ At every minute
 ```
 
 ### Show next execute time
+
 ```
 $ ezcron next "* * * * *"
 Next execute time: 2020-05-10 22:35:00 +0900 JST
