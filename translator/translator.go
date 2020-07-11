@@ -569,7 +569,7 @@ func OrdinalDay(str string) string {
 // ex: 0 -> 00, 1 -> 01
 func AddZeorforTenDigit(str string) string {
 	Re := regexp.MustCompile(`^\d{1}$`)
-	if Re.MatchString(str) == true {
+	if Re.MatchString(str) {
 		return "0" + str
 	}
 	return str
