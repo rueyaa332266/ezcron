@@ -3,9 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/rueyaa332266/ezcron)](https://goreportcard.com/report/github.com/rueyaa332266/ezcron)
 ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)
 
-Ezcron is a CLI tool.
-
-It helps you deal with cron expression.
+Ezcron is a CLI tool, helping you deal with cron expression easier.
 
 ## Feature
 - Creating cron expression with prompts
@@ -18,6 +16,7 @@ It helps you deal with cron expression.
 Create cron expression like a boss 😎
 
 ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/daily_schedule.gif)
+
 See more DEMO at [example](#Example)
 
 ## TODO
