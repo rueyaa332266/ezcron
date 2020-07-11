@@ -170,8 +170,7 @@ func Example_executeTimeSchedule() {
 func Example_executeDailySchedule() {
 	checkList := [][]string{
 		{"Daily_schedule", "every_day"},
-		{"Daily_schedule", "every_day_at", "01:01"},
-		{"Daily_schedule", "every_day_at", "01:01"},
+		{"Daily_schedule", "every_day", "at", "01:01"},
 		{"Daily_schedule"},
 		{"Daily_schedule", "test"},
 	}
@@ -181,7 +180,6 @@ func Example_executeDailySchedule() {
 
 	// Output:
 	// 0 0 */1 * *
-	// 1 1 */1 * *
 	// 1 1 */1 * *
 	// Invalid daily schedule
 	// Invalid daily schedule
@@ -289,13 +287,15 @@ func TestCompleteDailySchedule(t *testing.T) {
 	// var gotSub string
 	checkList := [][]string{
 		{"Daily_schedule:", "e"},
-		{"Daily_schedule:", "every_day_at", "1"},
+		{"Daily_schedule:", "every_day", "a"},
+		{"Daily_schedule:", "every_day", "at", "1"},
 	}
 	wantSuggestList := [][]prompt.Suggest{
-		{{Text: "every_day", Description: "every day at 00:00"}, {Text: "every_day_at", Description: "every day at __:__"}},
+		{{Text: "every_day", Description: "default at 00:00"}},
+		{{Text: "at", Description: "__:__"}},
 		makeTimeSuggest("time"),
 	}
-	wantSubtList := []string{"e", "1"}
+	wantSubtList := []string{"e", "a", "1"}
 	for i := range checkList {
 		gotSuggest, gotSub := completeDailySchedule(checkList[i])
 		wantSuggest := wantSuggestList[i]

@@ -3,7 +3,9 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/rueyaa332266/ezcron)](https://goreportcard.com/report/github.com/rueyaa332266/ezcron)
 ![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)
 
-Ezcron is a CLI tool. It helps you deal with cron expression.
+Ezcron is a CLI tool.
+
+It helps you deal with cron expression.
 
 ## DEMO
 
@@ -12,18 +14,23 @@ Create cron expression like a boss 😎
 ```shell
 $ezcron expression
 ```
-
-![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/time_schedule_1.gif)
-
 Five types of schedule are available.
 
 - Time schedule:
 
     Create a schedule at specific time or time interval.
+    - at HH:MM
+    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/time_schedule_1.gif)
+    - every_miniute X_minute
+    - every_hour X_hour
+    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/time_schedule_2.gif)
 
 - Daily schedule:
 
     Create a daily schedule at specific time.
+    - every_day (at 00:00)
+    - every_day at HH:MM
+    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/daily_schedule.gif)
 
 - Weekly schedule:
 

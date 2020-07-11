@@ -148,7 +148,7 @@ func executeTimeSchedule(inputs []string) {
 }
 
 func executeDailySchedule(inputs []string) {
-	if len(inputs) == 2 || len(inputs) == 3 {
+	if len(inputs) == 2 || len(inputs) == 4 {
 		last := inputs[len(inputs)-1]
 		re := regexp.MustCompile(`\d\d:\d\d`)
 		if re.MatchString(last) {
@@ -320,12 +320,17 @@ func completeDailySchedule(args []string) ([]prompt.Suggest, string) {
 	var suggest []prompt.Suggest
 	sub := args[1]
 	if len(args) == 2 {
-		suggest = []prompt.Suggest{{Text: "every_day", Description: "every day at 00:00"}, {Text: "every_day_at", Description: "every day at __:__"}}
+		suggest = []prompt.Suggest{{Text: "every_day", Description: "default at 00:00"}}
 		return suggest, sub
 	}
 	sub = args[2]
 	if len(args) == 3 {
-		suggest = makeSuggestByPreWord(args[1])
+		suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
+		return suggest, sub
+	}
+	sub = args[3]
+	if len(args) == 4 {
+		suggest = makeSuggestByPreWord(args[2])
 	}
 	return suggest, sub
 }
@@ -457,7 +462,7 @@ func completeYearlySchedule(args []string) ([]prompt.Suggest, string) {
 func makeSuggestByPreWord(pre string) []prompt.Suggest {
 	var suggest []prompt.Suggest
 	switch pre {
-	case "at", "every_day_at":
+	case "at":
 		suggest = makeTimeSuggest("time")
 	case "every_minute":
 		suggest = makeTimeSuggest("minute")
