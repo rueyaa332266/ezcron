@@ -22,6 +22,7 @@ var scheduleTypeSuggest = []prompt.Suggest{
 
 var dayWList = []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 var monthList = []string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
+var dayList = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"}
 
 func makeTimeSuggest(t string) []prompt.Suggest {
 	var timeSuggest []prompt.Suggest
@@ -52,22 +53,31 @@ func makeTimeSuggest(t string) []prompt.Suggest {
 }
 
 func makeWeekdaySuggest() []prompt.Suggest {
-	var weekDaysuggest []prompt.Suggest
+	var weekDaySuggest []prompt.Suggest
 	for _, v := range dayWList {
 		suggest := prompt.Suggest{Text: v, Description: "default at 00:00"}
-		weekDaysuggest = append(weekDaysuggest, suggest)
+		weekDaySuggest = append(weekDaySuggest, suggest)
 	}
-	return weekDaysuggest
+	return weekDaySuggest
 }
 
 func makeMonthdaySuggest() []prompt.Suggest {
-	var monthDaysuggest []prompt.Suggest
-	for i := 1; i <= 31; i++ {
-		day := translator.OrdinalDay(strconv.Itoa(i))
+	var monthDaySuggest []prompt.Suggest
+	for i := range dayList {
+		day := translator.OrdinalDay(dayList[i])
 		suggest := prompt.Suggest{Text: day + "_day", Description: "of month"}
-		monthDaysuggest = append(monthDaysuggest, suggest)
+		monthDaySuggest = append(monthDaySuggest, suggest)
 	}
-	return monthDaysuggest
+	return monthDaySuggest
+}
+
+func makeMonthdayNumberSuggest(src []string) []prompt.Suggest {
+	var monthDayNumbersSuggest []prompt.Suggest
+	for _, v := range src {
+		suggest := prompt.Suggest{Text: translator.OrdinalDay(v), Description: "default at 00:00"}
+		monthDayNumbersSuggest = append(monthDayNumbersSuggest, suggest)
+	}
+	return monthDayNumbersSuggest
 }
 
 func makeMonthNumSuggest() []prompt.Suggest {
@@ -417,28 +427,13 @@ func completeYearlySchedule(args []string) ([]prompt.Suggest, string) {
 		sub = args[3]
 		if contains(monthList, args[2]) {
 			if len(args) == 4 {
-				// make date 28 30 31
-				var day []string
-				for i := 1; i < 32; i++ {
-					day = append(day, strconv.Itoa(i))
-				}
-				day28 := day[:28]
-				day30 := day[:30]
-				f := func(src []string) []prompt.Suggest {
-					var suggests []prompt.Suggest
-					for _, v := range src {
-						suggest := prompt.Suggest{Text: translator.OrdinalDay(v), Description: "default at 00:00"}
-						suggests = append(suggests, suggest)
-					}
-					return suggests
-				}
 				switch args[2] {
 				case "February":
-					suggest = f(day28)
+					suggest = makeMonthdayNumberSuggest(dayList[:28])
 				case "April", "June", "September", "November":
-					suggest = f(day30)
+					suggest = makeMonthdayNumberSuggest(dayList[:30])
 				default:
-					suggest = f(day)
+					suggest = makeMonthdayNumberSuggest(dayList)
 				}
 				return suggest, sub
 			}

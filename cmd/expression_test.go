@@ -80,6 +80,31 @@ func TestMakeMonthdaySuggest(t *testing.T) {
 	}
 }
 
+func TestmakeMonthdayNumberSuggest(t *testing.T) {
+	var want []prompt.Suggest
+	checkList := [][]string{
+		dayList[:28],
+		dayList[:30],
+		dayList,
+	}
+	for d := 1; d < 32; d++ {
+		day := translator.OrdinalDay(strconv.Itoa(d))
+		suggest := prompt.Suggest{Text: day, Description: "default at 00:00"}
+		want = append(want, suggest)
+	}
+	wantList := [][]prompt.Suggest{
+		want[:28],
+		want[:30],
+		want,
+	}
+	for i := range checkList {
+		got := makeMonthdayNumberSuggest(checkList[i])
+		if !reflect.DeepEqual(got, wantList[i]) {
+			t.Errorf("Error when making month day suggest")
+		}
+	}
+}
+
 func TestMakeMonthNumSuggest(t *testing.T) {
 	want := []prompt.Suggest{
 		{Text: "1_month", Description: "default at 00:00"},
