@@ -64,7 +64,7 @@ func makeWeekdaySuggest() []prompt.Suggest {
 func makeMonthdaySuggest() []prompt.Suggest {
 	var monthDaysuggest []prompt.Suggest
 	for i := 1; i <= 31; i++ {
-		day := translator.OrdinalFromStr(strconv.Itoa(i))
+		day := translator.OrdinalDay(strconv.Itoa(i))
 		suggest := prompt.Suggest{Text: day + "_day", Description: "of month"}
 		monthDaysuggest = append(monthDaysuggest, suggest)
 	}
@@ -428,7 +428,7 @@ func completeYearlySchedule(args []string) ([]prompt.Suggest, string) {
 				f := func(src []string) []prompt.Suggest {
 					var suggests []prompt.Suggest
 					for _, v := range src {
-						suggest := prompt.Suggest{Text: translator.OrdinalFromStr(v), Description: "default at 00:00"}
+						suggest := prompt.Suggest{Text: translator.OrdinalDay(v), Description: "default at 00:00"}
 						suggests = append(suggests, suggest)
 					}
 					return suggests

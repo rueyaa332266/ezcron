@@ -102,7 +102,7 @@ func TestCheckFieldeReg_Minute(t *testing.T) {
 		{true, "*/1", "slash"},
 	}
 	for i := range checkList {
-		got := CheckFieldeReg(checkList[i], "minute")
+		got := checkFieldeReg(checkList[i], "minute")
 		want := &wantList[i]
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Error in pattern: %s", wantList[i].Pattern)
@@ -120,7 +120,7 @@ func TestCheckFieldeReg_Hour(t *testing.T) {
 		{true, "*/1", "slash"},
 	}
 	for i := range checkList {
-		got := CheckFieldeReg(checkList[i], "hour")
+		got := checkFieldeReg(checkList[i], "hour")
 		want := &wantList[i]
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Error in pattern: %s", wantList[i].Pattern)
@@ -138,7 +138,7 @@ func TestCheckFieldeReg_DayMonth(t *testing.T) {
 		{true, "*/1", "slash"},
 	}
 	for i := range checkList {
-		got := CheckFieldeReg(checkList[i], "dayM")
+		got := checkFieldeReg(checkList[i], "dayM")
 		want := &wantList[i]
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Error in pattern: %s", wantList[i].Pattern)
@@ -156,7 +156,7 @@ func TestCheckFieldeReg_Month(t *testing.T) {
 		{true, "*/1", "slash"},
 	}
 	for i := range checkList {
-		got := CheckFieldeReg(checkList[i], "month")
+		got := checkFieldeReg(checkList[i], "month")
 		want := &wantList[i]
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Error in pattern: %s", wantList[i].Pattern)
@@ -174,7 +174,7 @@ func TestCheckFieldeReg_DayWeek(t *testing.T) {
 		{true, "*/1", "slash"},
 	}
 	for i := range checkList {
-		got := CheckFieldeReg(checkList[i], "dayW")
+		got := checkFieldeReg(checkList[i], "dayW")
 		want := &wantList[i]
 		if !reflect.DeepEqual(got, want) {
 			t.Errorf("Error in pattern: %s", wantList[i].Pattern)
@@ -216,7 +216,7 @@ func TestExplainMinute(t *testing.T) {
 		"At every 1 minute from minute 1 through minute 2",
 	}
 	for i := range checkList {
-		got := explainMinute(CheckFieldeReg(checkList[i], "minute"))
+		got := explainMinute(checkFieldeReg(checkList[i], "minute"))
 		want := wantList[i]
 		if got != want {
 			t.Errorf("Got: %s, but want: %s", got, want)
@@ -237,7 +237,7 @@ func TestExplainHour(t *testing.T) {
 		"past every 1 hour from 01:00-02:00",
 	}
 	for i := range checkList {
-		got := explainHour(CheckFieldeReg(checkList[i], "hour"))
+		got := explainHour(checkFieldeReg(checkList[i], "hour"))
 		want := wantList[i]
 		if got != want {
 			t.Errorf("Got: %s, but want: %s", got, want)
@@ -258,7 +258,7 @@ func TestExplainDayMonth(t *testing.T) {
 		"on every 1 day of month between day 1 and day 2 of the month",
 	}
 	for i := range checkList {
-		got := explainDayMonth(CheckFieldeReg(checkList[i], "dayM"))
+		got := explainDayMonth(checkFieldeReg(checkList[i], "dayM"))
 		want := wantList[i]
 		if got != want {
 			t.Errorf("Got: %s, but want: %s", got, want)
@@ -279,7 +279,7 @@ func TestExplainMonth(t *testing.T) {
 		"in every 1 month from January through February",
 	}
 	for i := range checkList {
-		got := explainMonth(CheckFieldeReg(checkList[i], "month"))
+		got := explainMonth(checkFieldeReg(checkList[i], "month"))
 		want := wantList[i]
 		if got != want {
 			t.Errorf("Got: %s, but want: %s", got, want)
@@ -299,7 +299,7 @@ func TestExplainDayWeek(t *testing.T) {
 		"on every 1 day of week between Monday and Tuesday",
 	}
 	for i := range checkList {
-		got := explainDayWeek(CheckFieldeReg(checkList[i], "dayW"))
+		got := explainDayWeek(checkFieldeReg(checkList[i], "dayW"))
 		want := wantList[i]
 		if got != want {
 			t.Errorf("Got: %s, but want: %s", got, want)
@@ -330,11 +330,11 @@ func TestWeekDayToNum(t *testing.T) {
 	}
 }
 
-func TestOrdinalFromStr(t *testing.T) {
+func TestOrdinalDay(t *testing.T) {
 	checkList := []string{"1", "2", "3", "4"}
 	wantList := []string{"1st", "2nd", "3rd", "4th"}
 	for i := range checkList {
-		got := OrdinalFromStr(checkList[i])
+		got := OrdinalDay(checkList[i])
 		want := wantList[i]
 		if got != want {
 			t.Errorf("Got: %s, but want: %s", got, want)

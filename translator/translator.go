@@ -10,6 +10,10 @@ import (
 	"github.com/rueyaa332266/multiregexp"
 )
 
+// CheckResult is the reuslt of cronexpression feild.
+// "Valid" will be true when the expression is valid
+// "Input" is the value of the field
+// "Pattern" shows the feild pattern. Pattern has 5 types as following ["asterisk","number","comma","hyphen","slash"]
 type CheckResult struct {
 	Valid   bool
 	Input   string
@@ -19,6 +23,7 @@ type CheckResult struct {
 var dayList = [7]string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
 var monthList = [12]string{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"}
 
+// MatchCronReg show checkResult of every field
 // Field name     Mandatory?   Allowed values    Allowed special characters
 // ----------     ----------   --------------    --------------------------
 // Minutes        Yes          0-59              * / , -
@@ -37,15 +42,15 @@ func MatchCronReg(cronExpression string) (bool, map[string]*CheckResult) {
 	for index, field := range fieldSlice {
 		switch index {
 		case 0: // minute
-			checkResults["minute"] = CheckFieldeReg(field, "minute")
+			checkResults["minute"] = checkFieldeReg(field, "minute")
 		case 1: // hour
-			checkResults["hour"] = CheckFieldeReg(field, "hour")
+			checkResults["hour"] = checkFieldeReg(field, "hour")
 		case 2: // day of the month
-			checkResults["dayM"] = CheckFieldeReg(field, "dayM")
+			checkResults["dayM"] = checkFieldeReg(field, "dayM")
 		case 3: // month
-			checkResults["month"] = CheckFieldeReg(field, "month")
+			checkResults["month"] = checkFieldeReg(field, "month")
 		case 4: // day of the week
-			checkResults["dayW"] = CheckFieldeReg(field, "dayW")
+			checkResults["dayW"] = checkFieldeReg(field, "dayW")
 		}
 	}
 	valid := checkResults["minute"].Valid && checkResults["hour"].Valid && checkResults["dayM"].Valid && checkResults["month"].Valid && checkResults["dayW"].Valid
@@ -101,15 +106,15 @@ func numLogicFormat(input string, pattern string) (bool, string) {
 		output = strings.Join(unique, ",")
 	case "slash":
 		slice := strings.Split(input, "/")
-		validLeft, strLeft := numLogicFormat(slice[0], CheckFieldeReg(slice[0], "minute").Pattern)
-		validRight, strRight := numLogicFormat(slice[1], CheckFieldeReg(slice[1], "minute").Pattern)
+		validLeft, strLeft := numLogicFormat(slice[0], checkFieldeReg(slice[0], "minute").Pattern)
+		validRight, strRight := numLogicFormat(slice[1], checkFieldeReg(slice[1], "minute").Pattern)
 		valid = validLeft && validRight
 		output = strLeft + "/" + strRight
 	}
 	return valid, output
 }
 
-func CheckFieldeReg(str string, feild string) *CheckResult {
+func checkFieldeReg(str string, feild string) *CheckResult {
 	var number, comma string
 	switch feild {
 	case "minute":
@@ -140,6 +145,7 @@ func CheckFieldeReg(str string, feild string) *CheckResult {
 	return &CheckResult{Valid: valid, Input: str, Pattern: pattern}
 }
 
+// Explain print out the result of the translation
 func Explain(cronCheckResults map[string]*CheckResult) {
 	var explanation string
 	minuteCheckResult := cronCheckResults["minute"]
@@ -160,7 +166,7 @@ func Explain(cronCheckResults map[string]*CheckResult) {
 	// explain when one of day month and day week use "*/num"
 	if dayMonthCheckResult.Pattern == "slash" && dayWeekCheckResult.Pattern != "asterisk" {
 		sliceDayM := strings.Split(dayMonthCheckResult.Input, "/")
-		slachLeftDayM := CheckFieldeReg(sliceDayM[0], "dayM")
+		slachLeftDayM := checkFieldeReg(sliceDayM[0], "dayM")
 		explanationDayMonth := explainDayMonth(dayMonthCheckResult)
 		explanationDayWeek := explainDayWeek(dayWeekCheckResult)
 		if slachLeftDayM.Pattern == "asterisk" {
@@ -170,7 +176,7 @@ func Explain(cronCheckResults map[string]*CheckResult) {
 		}
 	} else if dayWeekCheckResult.Pattern == "slash" && dayMonthCheckResult.Pattern != "asterisk" {
 		sliceDayW := strings.Split(dayWeekCheckResult.Input, "/")
-		slachLeftDayW := CheckFieldeReg(sliceDayW[0], "dayM")
+		slachLeftDayW := checkFieldeReg(sliceDayW[0], "dayM")
 		explanationDayMonth := explainDayMonth(dayMonthCheckResult)
 		explanationDayWeek := explainDayWeek(dayWeekCheckResult)
 		if slachLeftDayW.Pattern == "asterisk" {
@@ -208,7 +214,7 @@ func explainMinute(c *CheckResult) string {
 		minute := c.Input
 		slice := strings.Split(minute, ",")
 		for i, v := range slice {
-			slice[i] = OrdinalFromStr(v)
+			slice[i] = OrdinalDay(v)
 		}
 		explanation += " every " + strings.Join(slice, " and ") + " minute"
 	case "hyphen":
@@ -226,7 +232,7 @@ func explaiMinuteSlach(c *CheckResult) string {
 	var output string
 	slice := strings.Split(minute, "/")
 	for i, v := range slice {
-		CheckResult := CheckFieldeReg(v, "minute")
+		CheckResult := checkFieldeReg(v, "minute")
 		// check the left side of slash
 		if i == 0 {
 			switch CheckResult.Pattern {
@@ -296,7 +302,7 @@ func explainHourSlach(c *CheckResult) string {
 	var output string
 	slice := strings.Split(hour, "/")
 	for i, v := range slice {
-		CheckResult := CheckFieldeReg(v, "hour")
+		CheckResult := checkFieldeReg(v, "hour")
 		// check the left side of slash
 		if i == 0 {
 			switch CheckResult.Pattern {
@@ -364,7 +370,7 @@ func explainDayMonthSlach(c *CheckResult) string {
 	var output string
 	slice := strings.Split(dayM, "/")
 	for i, v := range slice {
-		CheckResult := CheckFieldeReg(v, "dayM")
+		CheckResult := checkFieldeReg(v, "dayM")
 		// check the left side of slash
 		if i == 0 {
 			switch CheckResult.Pattern {
@@ -430,7 +436,7 @@ func explainMonthSlach(c *CheckResult) string {
 	var output string
 	slice := strings.Split(month, "/")
 	for i, v := range slice {
-		CheckResult := CheckFieldeReg(v, "month")
+		CheckResult := checkFieldeReg(v, "month")
 		// check the left side of slash
 		if i == 0 {
 			switch CheckResult.Pattern {
@@ -497,7 +503,7 @@ func explainDayWeekSlach(c *CheckResult) string {
 	var output string
 	slice := strings.Split(dayW, "/")
 	for i, v := range slice {
-		CheckResult := CheckFieldeReg(v, "dayW")
+		CheckResult := checkFieldeReg(v, "dayW")
 		// check the left side of slash
 		if i == 0 {
 			switch CheckResult.Pattern {
@@ -532,6 +538,7 @@ func explainDayWeekSlach(c *CheckResult) string {
 	return output
 }
 
+// MonthToNum change month into number
 func MonthToNum(str string) string {
 	pattern := [12]string{`(?i)Jan(uary)?`, `(?i)Feb(ruary)?`, `(?i)Mar(ch)?`, `(?i)Apr(il)?`, `(?i)May`, `(?i)June?`, `(?i)July?`, `(?i)Aug(ust)?`, `(?i)Sep(tember)?`, `(?i)Oct(ober)?`, `(?i)Nov(ember)?`, `(?i)Dec(ember)?`}
 	for i, v := range pattern {
@@ -541,6 +548,7 @@ func MonthToNum(str string) string {
 	return str
 }
 
+// WeekDayToNum change weekday into number
 func WeekDayToNum(str string) string {
 	pattern := [7]string{`(?i)Sun(day)?`, `(?i)Mon(day)?`, `(?i)Tue(sday)?`, `(?i)Wed(nesday)?`, `(?i)Thu(rsday)?`, `(?i)Fri(day)?`, `(?i)Sat(urday)?`}
 	for i, v := range pattern {
@@ -550,11 +558,15 @@ func WeekDayToNum(str string) string {
 	return str
 }
 
-func OrdinalFromStr(str string) string {
+// OrdinalDay add ordinal suffix for number
+// ex: 1 -> 1st, 2 -> 2nd, 3 -> 3rd
+func OrdinalDay(str string) string {
 	i, _ := strconv.Atoi(str)
 	return humanize.Ordinal(i)
 }
 
+// AddZeorforTenDigit add prefix 0 for 0~9
+// ex: 0 -> 00, 1 -> 01
 func AddZeorforTenDigit(str string) string {
 	Re := regexp.MustCompile(`^\d{1}$`)
 	if Re.MatchString(str) == true {

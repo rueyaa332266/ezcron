@@ -71,7 +71,7 @@ func TestMakeMonthdaySuggest(t *testing.T) {
 	var want []prompt.Suggest
 	got := makeMonthdaySuggest()
 	for d := 1; d < 32; d++ {
-		day := translator.OrdinalFromStr(strconv.Itoa(d))
+		day := translator.OrdinalDay(strconv.Itoa(d))
 		suggest := prompt.Suggest{Text: day + "_day", Description: "of month"}
 		want = append(want, suggest)
 	}
@@ -359,7 +359,7 @@ func TestCompletYearlySchedule(t *testing.T) {
 	f := func(src []string) []prompt.Suggest {
 		var suggests []prompt.Suggest
 		for _, v := range src {
-			suggest := prompt.Suggest{Text: translator.OrdinalFromStr(v), Description: "default at 00:00"}
+			suggest := prompt.Suggest{Text: translator.OrdinalDay(v), Description: "default at 00:00"}
 			suggests = append(suggests, suggest)
 		}
 		return suggests
