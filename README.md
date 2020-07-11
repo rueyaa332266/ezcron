@@ -7,58 +7,36 @@ Ezcron is a CLI tool.
 
 It helps you deal with cron expression.
 
-## DEMO
-
-Create cron expression like a boss 😎
-
-```shell
-$ezcron expression
-```
-Five types of schedule are available.
-
-- Time schedule:
-
-    Create a schedule at specific time or time interval.
-    - at HH:MM
-    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/time_schedule_1.gif)
-    - every_miniute X_minute
-    - every_hour X_hour
-    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/time_schedule_2.gif)
-
-- Daily schedule:
-
-    Create a daily schedule at specific time.
-    - every_day (at 00:00)
-    - every_day at HH:MM
-    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/daily_schedule.gif)
-
-- Weekly schedule:
-
-    Create a weekly schedule on specific weekday at specific time.
-
-- Monthly schedule
-
-    Create a monthly schedule on specific monthday at specific time.
-
-- Yearly schedule
-
-    Create a yearly schedule in specific date at specific time.
-
 ## Feature
 - Creating cron expression with prompts
 - Translate cron expression into human-friendly language
 - Show the next execute time
-- And more ...
+- And more (keep working) ...
+
+## DEMO
+
+Create cron expression like a boss 😎
+
+![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/daily_schedule.gif)
+See more DEMO at [example](#Example)
 
 ## TODO
-- Add the test
-- More DEMO of each type of schedule
 - Add number option for Next command
 - Refactor the code
 
 ## CRON Expression Format
-Only support 5 space-separated fields.
+Only support 5 fields.
 ```
+# ┌───────────── minute (0 - 59)
+# │ ┌───────────── hour (0 - 23)
+# │ │ ┌───────────── day of month (1 - 31)
+# │ │ │ ┌───────────── month (1 - 12)
+# │ │ │ │ ┌───────────── day of  week (0 - 6) (Sunday to Saturday)
+# │ │ │ │ │
+# │ │ │ │ │
+# │ │ │ │ │
+# * * * * *
+------------------------------------------------------------------------
 Field name     Mandatory?   Allowed values    Allowed special characters
 ----------     ----------   --------------    --------------------------
 Minutes        Yes          0-59              * / , -
@@ -93,6 +71,59 @@ Use "ezcron [command] --help" for more information about a command.
 ```
 
 ## Example
+
+### Create cron expression
+
+```shell
+$ ezcron expression
+```
+Five types of schedule are available.
+
+- #### Time schedule:
+
+    Create a schedule at specific time or time interval.
+    - at {HH:MM}
+
+    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/time_schedule_1.gif)
+    - every_miniute {X_MINUTE}
+    - every_hour {X_HOUR}
+
+    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/time_schedule_2.gif)
+
+- #### Daily schedule:
+
+    Create a daily schedule at specific time.
+    - every_day
+    - every_day at {HH:MM}
+
+    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/daily_schedule.gif)
+
+- #### Weekly schedule:
+
+    Create a weekly schedule on specific weekday at specific time.
+    - on_every {WEEKDAY}
+    - on_every {WEEKDAY} at {HH:MM}
+
+    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/weekly_schedule.gif)
+
+- #### Monthly schedule
+
+    Create a monthly schedule on specific monthday at specific time.
+    - on {MONTHDAY} of_every_month
+    - on {MONTHDAY} of_every_month at {HH:MM}
+    - on {MONTHDAY} of_every {X_MONTH}
+    - on {MONTHDAY} of_every {X_MONTH} at {HH:MM}
+
+    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/monthly_schedule.gif)
+
+- #### Yearly schedule
+
+    Create a yearly schedule in specific date at specific time.
+    - in_every {MONTH} {MONTHDAY}
+    - in_every {MONTH} {MONTHDAY} at {HH:MM}
+
+    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/yearly_schedule.gif)
+
 
 ### Translate cron expression
 
