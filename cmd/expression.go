@@ -13,11 +13,11 @@ import (
 )
 
 var scheduleTypeSuggest = []prompt.Suggest{
-	{Text: "Time_schedule:", Description: "Create a schedule at specific time or time interval"},
+	{Text: "Time_schedule:", Description: "Create a schedule in time intervals"},
 	{Text: "Daily_schedule:", Description: "Create a daily schedule at specific time"},
 	{Text: "Weekly_schedule:", Description: "Create a weekly schedule on specific weekday at specific time"},
 	{Text: "Monthly_schedule:", Description: "Create a monthly schedule on specific monthday at specific time"},
-	{Text: "Yearly_schedule:", Description: "Create a yearly schedule in specific month on specific monthday at specific time"},
+	{Text: "Yearly_schedule:", Description: "Create a yearly schedule on specific date at specific time"},
 }
 
 var dayWList = []string{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
@@ -129,16 +129,10 @@ func executor(in string) {
 func executeTimeSchedule(inputs []string) {
 	if len(inputs) == 3 {
 		last := inputs[len(inputs)-1]
-		re := regexp.MustCompile(`\d\d:\d\d`)
 		if strings.Contains(last, "minute") {
 			fmt.Println("*/" + strings.Split(last, "_")[0] + " * * * *")
 		} else if strings.Contains(last, "hour") {
 			fmt.Println("* */" + strings.Split(last, "_")[0] + " * * *")
-		} else if re.MatchString(last) {
-			time := strings.Split(last, ":")
-			minute := strings.TrimPrefix(time[1], "0")
-			hour := strings.TrimPrefix(time[0], "0")
-			fmt.Println(minute + " " + hour + " * * *")
 		} else {
 			fmt.Println("Invalid time schedule")
 		}
@@ -306,7 +300,7 @@ func completeTimeSchedule(args []string) ([]prompt.Suggest, string) {
 	var suggest []prompt.Suggest
 	sub := args[1]
 	if len(args) == 2 {
-		suggest = []prompt.Suggest{{Text: "at", Description: "__:__ every day"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}}
+		suggest = []prompt.Suggest{{Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}}
 		return suggest, sub
 	}
 	sub = args[2]
@@ -324,13 +318,15 @@ func completeDailySchedule(args []string) ([]prompt.Suggest, string) {
 		return suggest, sub
 	}
 	sub = args[2]
-	if len(args) == 3 {
-		suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
-		return suggest, sub
-	}
-	sub = args[3]
-	if len(args) == 4 {
-		suggest = makeSuggestByPreWord(args[2])
+	if args[1] == "every_day" {
+		if len(args) == 3 {
+			suggest = []prompt.Suggest{{Text: "at", Description: "__:__"}}
+			return suggest, sub
+		}
+		sub = args[3]
+		if len(args) == 4 {
+			suggest = makeSuggestByPreWord(args[2])
+		}
 	}
 	return suggest, sub
 }

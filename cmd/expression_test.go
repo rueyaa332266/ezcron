@@ -149,18 +149,16 @@ func TestMakeMonthSuggest(t *testing.T) {
 
 func Example_executeTimeSchedule() {
 	checkList := [][]string{
-		{"Time_schedule", "at", "00:00"},
 		{"Time_schedule", "every_minute", "1_minute"},
 		{"Time_schedule", "every_hour", "1_hour"},
 		{"Time_schedule", "test"},
-		{"Time_schedule", "at", "test"},
+		{"Time_schedule", "every_hour", "test"},
 	}
 	for i := range checkList {
 		executeTimeSchedule(checkList[i])
 	}
 
 	// Output:
-	// 0 0 * * *
 	// */1 * * * *
 	// * */1 * * *
 	// Invalid time schedule
@@ -257,18 +255,16 @@ func TestCompleteTimeSchedule(t *testing.T) {
 	// var gotSuggest []prompt.Suggest
 	// var gotSub string
 	checkList := [][]string{
-		{"Time_schedule:", "a"},
-		{"Time_schedule:", "at", "0"},
+		{"Time_schedule:", "e"},
 		{"Time_schedule:", "every_minute", "1"},
 		{"Time_schedule:", "every_hour", "2"},
 	}
 	wantSuggestList := [][]prompt.Suggest{
-		{{Text: "at", Description: "__:__ every day"}, {Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}},
-		makeTimeSuggest("time"),
+		{{Text: "every_minute", Description: "per minute"}, {Text: "every_hour", Description: "per hour"}},
 		makeTimeSuggest("minute"),
 		makeTimeSuggest("hour"),
 	}
-	wantSubtList := []string{"a", "0", "1", "2"}
+	wantSubtList := []string{"e", "1", "2"}
 	for i := range checkList {
 		gotSuggest, gotSub := completeTimeSchedule(checkList[i])
 		wantSuggest := wantSuggestList[i]

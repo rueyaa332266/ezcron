@@ -79,14 +79,11 @@ Five types of schedule are available.
 
 - #### Time schedule:
 
-    Create a schedule at specific time or time interval.
-    - at {HH:MM}
-
-    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/time_schedule_1.gif)
+    Create a schedule in time intervals.
     - every_miniute {X_MINUTE}
     - every_hour {X_HOUR}
 
-    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/time_schedule_2.gif)
+    ![demo](https://github.com/rueyaa332266/assets/raw/master/ezcron/time_schedule.gif)
 
 - #### Daily schedule:
 
@@ -116,7 +113,7 @@ Five types of schedule are available.
 
 - #### Yearly schedule
 
-    Create a yearly schedule in specific date at specific time.
+    Create a yearly schedule on specific date at specific time.
     - in_every {MONTH} {MONTHDAY}
     - in_every {MONTH} {MONTHDAY} at {HH:MM}
 
